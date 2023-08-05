@@ -171,68 +171,66 @@
 <header id="title-block-header">
 <h1 class="title">Networking Concepts</h1>
 </header>
-<h1 class="unnumbered" id="slides">Slides</h1>
+<h2 id="slides">Slides</h2>
 <p><a
 href="files/networking-concepts/Fundamentals+of+Networking+for+Effective+Backends-v5.pdf">Slides</a></p>
-<h1 class="unnumbered"
-id="standard-communication-models-for-networking">Standard communication
-models for Networking</h1>
+<h2 id="standard-communication-models-for-networking">Standard
+communication models for Networking</h2>
 <p>A standard model allows decoupling, so that the layers can be worked
 on or upgraded without worrying about the rest.</p>
-<h2 class="unnumbered" id="osi-open-systems-interconnect-model">OSI
-(Open Systems Interconnect) Model</h2>
+<h3 id="osi-open-systems-interconnect-model">OSI (Open Systems
+Interconnect) Model</h3>
 <p><a href="https://en.wikipedia.org/wiki/OSI_model">OSI (Open Systems
 Interconnect) Model</a></p>
 <p>7 Layers each describe a specific networking component</p>
 <ul>
-<li><p>Layer 7 - Application - HTTP/FTP/gRPC</p></li>
-<li><p>Layer 6 - Presentation - Encoding, Serialization</p></li>
-<li><p>Layer 5 - Session - Connection establishment, TLS</p></li>
-<li><p>Layer 4 - Transport - UDP/TCP</p></li>
-<li><p>Layer 3 - Network - IP</p></li>
-<li><p>Layer 2 - Data link - Frames, Mac address Ethernet</p></li>
-<li><p>Layer 1 - Physical - Electric signals, fiber or radio
-waves</p></li>
+<li>Layer 7 - Application - HTTP/FTP/gRPC</li>
+<li>Layer 6 - Presentation - Encoding, Serialization</li>
+<li>Layer 5 - Session - Connection establishment, TLS</li>
+<li>Layer 4 - Transport - UDP/TCP</li>
+<li>Layer 3 - Network - IP</li>
+<li>Layer 2 - Data link - Frames, Mac address Ethernet</li>
+<li>Layer 1 - Physical - Electric signals, fiber or radio waves</li>
 </ul>
-<h2 class="unnumbered"
-id="the-tcpip-model-or-internet-protocol-suite">The TCP/IP Model or
-Internet Protocol Suite</h2>
+<h3 id="the-tcpip-model-or-internet-protocol-suite">The TCP/IP Model or
+Internet Protocol Suite</h3>
 <p><a href="https://en.wikipedia.org/wiki/Internet_protocol_suite">The
 TCP/IP Model or Internet Protocol Suite</a></p>
-<p>Much simpler than OSI, just 4 layers</p>
+<p>Much simpler than OSI, just 4 layer</p>
 <ul>
-<li><p>Application (Layer 5, 6 and 7)</p></li>
-<li><p>Transport (Layer 4)</p></li>
-<li><p>Internet (Layer 3)</p></li>
-<li><p>Data link (Layer 2)</p></li>
+<li>Application (Layer 5, 6 and 7)</li>
+<li>Transport (Layer 4)</li>
+<li>Internet (Layer 3)</li>
+<li>Data link (Layer 2)</li>
 </ul>
 <p>Physical layer is not officially covered in the model</p>
-<h1 class="unnumbered" id="data-link-layer">Data Link Layer</h1>
-<h2 class="unnumbered" id="arp-address-resolution-protocol">ARP (Address
-Resolution Protocol)</h2>
+<h2 id="data-link-layer">Data Link Layer</h2>
+<h3 id="arp-address-resolution-protocol">ARP (Address Resolution
+Protocol)</h3>
 <p>It is used to translate IP addresses to MAC addresses, since IPs are
 changeable and MAC addresses are (usually) fixed. ARP is local.</p>
 <p><a
-href="https://www.tcpdump.org/manpages/tcpdump.1.html"><code>tcpdump</code></a></p>
-<p>Tcpdump prints out a description of the contents of packets on a
-network interface.</p>
-<p><code>tcpdump -n -i wlp3s0 arp</code></p>
-<p><code>tcpdump</code> with src and dst filters</p>
-<p><code>tcpdump -n -v -i wlp3s0 src 192.168.1.2 or dst 142.243.66.23</code></p>
+href="https://www.tcpdump.org/manpages/tcpdump.1.html">tcpdump</a></p>
+<ul>
+<li><code>tcpdump -n -i wlp3s0 arp</code></li>
+</ul>
+<p><code>tcpdump</code> with src and dst filters:</p>
+<ul>
+<li><code>tcpdump -n -v -i wlp3s0 src 192.168.1.2 or dst 142.243.66.23</code></li>
+</ul>
 <p>To deliver the packet to the destination host, the source IP,
 destination IP, source MAC address, and destination MAC address should
 be known. Some basic rules for the packet flow:</p>
 <ul>
-<li><p>If the destination host is present in the same network, then the
-packet is delivered directly to the destination host.</p></li>
-<li><p>If the destination host is present in a different network, then
-the packet is delivered to the default gateway first which in turn
-delivers the packet to the destination host.</p></li>
-<li><p>If ARP is not resolved then ARP will be resolved first.</p></li>
-<li><p>MAC address never crosses its broadcast domain.</p></li>
+<li>If the destination host is present in the same network, then the
+packet is delivered directly to the destination host.</li>
+<li>If the destination host is present in a different network, then the
+packet is delivered to the default gateway first which in turn delivers
+the packet to the destination host.</li>
+<li>If ARP is not resolved then ARP will be resolved first.</li>
+<li>MAC address never crosses its broadcast domain.</li>
 </ul>
-<h2 class="unnumbered" id="host-to-host-communication">Host to Host
-Communication</h2>
+<h3 id="host-to-host-communication">Host to Host Communication</h3>
 <p>Finding a device with a unique MAC address in a network is done by
 sending requests to all devices in the network. Only the device with the
 intended MAC address accepts the connection. But when the network is of
@@ -253,47 +251,50 @@ subnets. Because the subnets are usually connected by a router (the
 routers live in both networks), if the router is congested, we are gonna
 see delays. Instead, we can use a switch in between the database and the
 backend.</p>
-<h1 class="unnumbered" id="network-layer">Network Layer</h1>
+<h2 id="network-layer-internet-layer">Network Layer / Internet
+Layer</h2>
 <p><a href="https://en.wikipedia.org/wiki/Internet_Protocol">IP</a> is
 the network layer communications protocol.</p>
 <p>IP Addresses are a layer 3 property. Can be set automatically or
-statically, has <em>network</em> and <em>host</em> portions. 4 bytes in
-IPv4 - 32 bits.</p>
+statically, has <strong>network</strong> and <strong>host</strong>
+portions. 4 bytes in IPv4 - 32 bits.</p>
 <ul>
-<li><p>a.b.c.d/x (a, b, c, d, x are integers). x is the network bits,
+<li>a.b.c.d/x (a, b, c, d, x are integers). x is the network bits,
 remaining are the host. <a
 href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR
-Notation</a></p></li>
+Notation</a></li>
 </ul>
-<h2 class="unnumbered" id="icmp-internet-control-message-protocol">ICMP
-(Internet Control Message Protocol)</h2>
+<h3 id="icmp-internet-control-message-protocol">ICMP (Internet Control
+Message Protocol)</h3>
 <p>It is used by network devices, including routers, to send error
 messages and operational information indicating success or failure when
 communicating with another IP address. It is used by ping and
 traceroute.</p>
-<p><code>ping google.com</code></p>
-<p><code>traceroute google.com</code></p>
-<p><code>tcpdump -n -i wlp3s0 icmp</code></p>
-<h1 class="unnumbered" id="transport-layer">Transport Layer</h1>
-<h2 class="unnumbered" id="udp-user-datagram-protocol"><a
+<ul>
+<li><code>ping google.com</code></li>
+<li><code>traceroute google.com</code></li>
+<li><code>tcpdump -n -i wlp3s0 icmp</code></li>
+</ul>
+<h2 id="transport-layer">Transport Layer</h2>
+<h3 id="udp-user-datagram-protocol"><a
 href="https://en.wikipedia.org/wiki/User_Datagram_Protocol">UDP (User
-Datagram Protocol)</a></h2>
+Datagram Protocol)</a></h3>
 <p>Layer 4 protocol, sits on top of the IP protocol (Network layer).
 While IP can address a host using IP addresses, UDP has the ability to
 address processes in a host using ports. Simpler and stateless protocol,
 compared to TCP. Has 8-byte header on top of 20 bytes of the IP packet.
 Used for:</p>
 <ul>
-<li><p>Video Streaming</p></li>
-<li><p>VPN</p></li>
-<li><p>DNS</p></li>
-<li><p>WebRTC uses UDP. Websockets, on the other hand, use TCP</p></li>
-<li><p>Games</p></li>
-<li><p>P2P</p></li>
+<li>Video Streaming</li>
+<li>VPN</li>
+<li>DNS</li>
+<li>WebRTC uses UDP. Websockets, on the other hand, use TCP</li>
+<li>Games</li>
+<li>P2P</li>
 </ul>
 <p>Multiplexing (many to one) and demultiplexing (one to many). IP
 targets hosts only. Each host can have multiple applications running.
-Ports can be used to identify the ’apps’ or ’processes’. The sender
+Ports can be used to identify the ‘apps’ or ‘processes’. The sender
 multiplexes all inputs into single IP packets into UDP, and the receiver
 demultiplexes UDP datagrams in IP packets to each app or process. A
 four-tuple (Source IP, Source Port, Destination IP, Destination Port)
@@ -307,23 +308,25 @@ server process. Practically though, some of the ports are already
 reserved.</p>
 <p>Capturing DNS server requests and responses using
 <code>tcpdump</code>:</p>
-<p><code>nslookup google.com 8.8.8.8</code></p>
-<p><code>tcpdump -n -v -i wlp3s0 src 8.8.8.8 or dst 8.8.8.8</code></p>
-<h2 class="unnumbered" id="tcp-transmission-control-protocol"><a
+<ul>
+<li><code>nslookup google.com 8.8.8.8</code></li>
+<li><code>tcpdump -n -v -i wlp3s0 src 8.8.8.8 or dst 8.8.8.8</code></li>
+</ul>
+<h3 id="tcp-transmission-control-protocol"><a
 href="https://en.wikipedia.org/wiki/Transmission_Control_Protocol">TCP
-(Transmission Control Protocol)</a></h2>
+(Transmission Control Protocol)</a></h3>
 <p>Similar to UDP, it’s a Layer 4 protocol and can address processes in
-a host using ports. It ’controls’ the transmission, unlike UDP which is
+a host using ports. It ‘controls’ the transmission, unlike UDP which is
 like a firehose. Requires a connection before transmitting data.
-Connection is made using a ’handshake’. Hence it’s stateful. Has 20
+Connection is made using a ‘handshake’. Hence it’s stateful. Has 20
 bytes header. Used for reliable communications like:</p>
 <ul>
-<li><p>Remote Shell</p></li>
-<li><p>Database Connections</p></li>
-<li><p>Web Communications (HTTP1, HTTP2 is built on top of TCP, HTTP3 is
+<li>Remote Shell</li>
+<li>Database Connections</li>
+<li>Web Communications (HTTP1, HTTP2 is built on top of TCP, HTTP3 is
 built on top of QUIC which is built on top of UDP and aims to be better
-than TCP)</p></li>
-<li><p>Any bidirectional communication</p></li>
+than TCP)</li>
+<li>Any bidirectional communication</li>
 </ul>
 <p>TCP Connection is a Layer 5 (session) concept. The connection between
 client and server must be there to send data, can’t send data outside of
@@ -336,38 +339,174 @@ sockets).</p>
 or TCP socket. An internet socket is minimally characterized by the
 following:</p>
 <ul>
-<li><p>local socket address, consisting of the local IP address and (for
-TCP and UDP, but not IP) a port number</p></li>
-<li><p>protocol: A transport protocol, e.g., TCP, UDP, raw IP. This
-means that (local or remote) endpoints with TCP port 53 and UDP port 53
-are distinct sockets, while IP does not have ports.</p></li>
-<li><p>A socket that has been connected to another socket, e.g., during
-the establishment of a TCP connection, also has a remote socket
-address.</p></li>
+<li>local socket address, consisting of the local IP address and (for
+TCP and UDP, but not IP) a port number</li>
+<li>protocol: A transport protocol, e.g., TCP, UDP, raw IP. This means
+that (local or remote) endpoints with TCP port 53 and UDP port 53 are
+distinct sockets, while IP does not have ports.</li>
+<li>A socket that has been connected to another socket, e.g., during the
+establishment of a TCP connection, also has a remote socket
+address.</li>
 </ul>
 <p>The Transmission Control Protocol differs in several key features
 compared to the User Datagram Protocol:</p>
 <ul>
-<li><p>Ordered data transfer: the destination host rearranges segments
-according to a sequence number</p></li>
-<li><p>Retransmission of lost packets: any cumulative stream not
-acknowledged is retransmitted</p></li>
-<li><p>Error-free data transfer: corrupted packets are treated as lost
-and are retransmitted</p></li>
-<li><p>Flow control: limits the rate a sender transfers data to
-guarantee reliable delivery. The receiver continually hints the sender
-on how much data can be received (receiver sends an <code>ACK</code>
-with its window size[max 64KB but can be scaled up with the window
-scaling factor(0-14), so hat window size can go upto 1GB]). When the
-receiving host’s buffer fills, the next acknowledgment suspends the
-transfer and allows the data in the buffer to be processed. Employs a
-<code>window sliding mechanism</code>.</p></li>
-<li><p>Congestion control: the receiver might handle the load but the
-middle boxes(routers) might not. lost packets (presumed due to
-congestion) trigger a reduction in data delivery rate</p></li>
+<li><strong>Ordered data transfer</strong>: the destination host
+rearranges segments according to a sequence number</li>
+<li><strong>Retransmission of lost packets</strong>: any cumulative
+stream not acknowledged is retransmitted</li>
+<li><strong>Error-free data transfer</strong>: corrupted packets are
+treated as lost and are retransmitted</li>
+<li><strong>Flow control</strong>: limits the rate a sender transfers
+data to guarantee reliable delivery. The receiver continually hints the
+sender on how much data can be received (receiver sends an
+<strong>ACK</strong> with its window size [max 64KB but can be scaled up
+with the window scaling factor (0-14), so that window size can go up to
+1GB]). When the receiving host’s buffer fills, the next acknowledgment
+suspends the transfer and allows the data in the buffer to be processed.
+Employs a <strong>window sliding mechanism</strong>.</li>
+<li><strong>Congestion control</strong>: the receiver might handle the
+load but the middle boxes (routers) might not. lost packets (presumed
+due to congestion) trigger a reduction in data delivery rate</li>
 </ul>
-<h3 class="unnumbered" id="maximum-segment-size">Maximum Segment
-Size</h3>
+<h4 id="tcp-states">TCP States</h4>
+<p>By definition TCP is a stateful protocol and it has states. Both
+client and server have to maintain states like window sizes, sequences,
+and the state of the connection.</p>
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 8%" />
+<col style="width: 85%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>State</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LISTEN</td>
+<td>Server</td>
+<td>Waiting for a connection request from any remote TCP end-point.</td>
+</tr>
+<tr class="even">
+<td>SYN-SENT</td>
+<td>Client</td>
+<td>Waiting for a matching connection request after having sent a
+connection request.</td>
+</tr>
+<tr class="odd">
+<td>SYN-RECEIVED</td>
+<td>Server</td>
+<td>Waiting for a confirming connection request acknowledgment after
+having both received and sent a connection request.</td>
+</tr>
+<tr class="even">
+<td>ESTABLISHED</td>
+<td>Server and client</td>
+<td>An open connection, data received can be delivered to the user. The
+normal state for the data transfer phase of the connection.</td>
+</tr>
+<tr class="odd">
+<td>FIN-WAIT-1</td>
+<td>Server and client</td>
+<td>Waiting for a connection termination request from the remote TCP, or
+an acknowledgment of the connection termination request previously
+sent.</td>
+</tr>
+<tr class="even">
+<td>FIN-WAIT-2</td>
+<td>Server and client</td>
+<td>Waiting for a connection termination request from the remote
+TCP.</td>
+</tr>
+<tr class="odd">
+<td>CLOSE-WAIT</td>
+<td>Server and client</td>
+<td>Waiting for a connection termination request from the local
+user.</td>
+</tr>
+<tr class="even">
+<td>CLOSING</td>
+<td>Server and client</td>
+<td>Waiting for a connection termination request acknowledgment from the
+remote TCP.</td>
+</tr>
+<tr class="odd">
+<td>LAST-ACK</td>
+<td>Server and client</td>
+<td>Waiting for an acknowledgment of the connection termination request
+previously sent to the remote TCP (which includes an acknowledgment of
+its connection termination request).</td>
+</tr>
+<tr class="even">
+<td>TIME-WAIT</td>
+<td>Server or client</td>
+<td>Waiting for enough time to pass to be sure that all remaining
+packets on the connection have expired.</td>
+</tr>
+<tr class="odd">
+<td>CLOSED</td>
+<td>Server and client</td>
+<td>No connection state at all.</td>
+</tr>
+</tbody>
+</table>
+<p>When the server sends the last <strong>fin</strong>, the client after
+receiving it sends the last <strong>ack</strong> to the server. The
+server can now <strong>CLOSE</strong>. Basically there is no further
+communication from the server. The client doesn’t really know if the
+server received the <strong>ack</strong> or not (also called the <a
+href="https://en.wikipedia.org/wiki/Two_Generals%27_Problem">Two
+Generals’ Problem</a>). The client now goes into a
+<strong>TIME_WAIT</strong> state, which is 4 minutes
+[<code>2 MSL(Maximum Segment Length)</code>].</p>
+<figure>
+<img src="files/networking-concepts/tcp-socket-states.png"
+alt="TCP Socket States" />
+<figcaption aria-hidden="true">TCP Socket States</figcaption>
+</figure>
+<p><em>Note [Optimization]</em> Whoever requests the
+<strong>fin</strong> will end up in the <strong>TIME_WAIT</strong>
+state. We wouldn’t want the server to be flooded with these waits when
+closing connections. If you own the frontend and the backend, you can
+design a protocol such that you send a request so that the client can
+instantiate the <strong>fin</strong> for you. The client will be in the
+<strong>TIME_WAIT</strong> state, which will free up the server.</p>
+<h2 id="nat-network-address-translation">NAT (Network Address
+Translation)</h2>
+<p>IPV4 has a limit of 4 billion addresses which is not enough
+considering the number of devices connected to the Internet. IPV6 also
+solves this issue but for IPV4 addressing, NAT allows multiples of
+devices to access the internet while also remaining private inside a
+network. It gives one public IP address (the gateway) and multiple
+private addresses for internal use.</p>
+<p>NAT uses the IP ranges - 192.168.x.x, 10.0.0.x allocated specifically
+for private networks.</p>
+<p>All devices have the same public IP address which is the router. The
+source port and IP address are being mapped to a different source Port
+and IP for communication with the internet. This mapping called the ‘NAT
+table’ lives in the router has mappings to/from public and private
+ip-port pairs.</p>
+<p>Applications:</p>
+<ul>
+<li>Private to Public translations: So we don’t run out IPv4</li>
+<li>Port forwarding: Add a NAT entry in the router to forward packets to
+80 to a machine (any port, maybe 8080) in your LAN. No need to have root
+access to listen on port 80 on your device. Expose your local web server
+publicly</li>
+<li>Layer 4 Load Balancing: <a
+href="https://www.haproxy.com/blog/layer-4-load-balancing-nat-mode">HAProxy
+NAT Mode</a> - Your load balancer is your gateway. The gateway has an
+entry from a bogus IP (e.g. 100.100.100.100) to multiple machines in the
+internal network. Clients send a request to the bogus service IP. The
+router intercepts that packet and replaces the service IP with a
+destination server. Layer 4 reverse proxying</li>
+</ul>
+<h2 id="maximum-segment-size">Maximum Segment Size</h2>
 <p><a
 href="https://www.cloudflare.com/learning/network-layer/what-is-mss/">MSS
 (maximum segment size)</a> limits the size of packets, or small chunks
@@ -381,40 +520,24 @@ href="https://www.cloudflare.com/learning/network-layer/what-is-mtu/">MTU
 and an IP header:</p>
 <p><span
 class="math display"><em>M</em><em>T</em><em>U</em> − (<em>T</em><em>C</em><em>P</em><em>h</em><em>e</em><em>a</em><em>d</em><em>e</em><em>r</em>+<em>I</em><em>P</em><em>h</em><em>e</em><em>a</em><em>d</em><em>e</em><em>r</em>) = <em>M</em><em>S</em><em>S</em></span></p>
-<div class="center">
 <figure>
-<img src="files/networking-concepts/data-packet.png" />
-<figcaption>A data packet</figcaption>
+<img src="files/networking-concepts/data-packet.png"
+alt="A data packet" />
+<figcaption aria-hidden="true">A data packet</figcaption>
 </figure>
-</div>
 <p>One of the key differences between MTU and MSS is that if a packet
 exceeds a device’s MTU, it is broken up into smaller pieces, or
-"fragmented." In contrast, if a packet exceeds the MSS, it is dropped
+“fragmented.” In contrast, if a packet exceeds the MSS, it is dropped
 and not delivered.</p>
 <p>The maximum MTU of the internet is 1500 bytes, and the maximum MSS is
 1460 bytes.</p>
-<p>&gt; Since then various other transmission systems have come and
-gone, but the lowest MTU value of them has still been Ethernet at 1500
-bytes. Going bigger than the lowest MTU on a network will either result
-in IP fragmentation, or the need to do path MTU detection. Both of which
-have their own sets of problems. Even if sometimes large OS vendors
-dropped the default MTU to even lower at times.</p>
-<h2 class="unnumbered" id="nat-network-address-translation">NAT (Network
-Address Translation)</h2>
-<p>IPV4 has a limit of 4 billion adressess which is not enough
-considering the number of devices connected to the Internet.IPV6 also
-solves this issue but for IPV4 adressing, NAT allows multiples of
-devices to access the internet while also remaining private inside a
-network. It gives one public IP address(the gateway) and multiple
-private adresses for internal use. While it was inventeted to help with
-the ipv4 addressing issue, NAT also has a usecase for Layer 4 load
-balancing.</p>
-<p>All devices have the same public IP address which is the router. The
-source port and IP adress is being mapped to a different source Port and
-IP for communication with the internet. This mapping called the ’NAT
-table’ lives in the router has mappings to/from public and private
-ip-port pairs.</p>
-<p>NAT uses the IP ranges - 192.168.x.x, 10.0.0.x allocated specifically
-for private networks.</p>
+<blockquote>
+<p>Since then various other transmission systems have come and gone, but
+the lowest MTU value of them has still been Ethernet at 1500 bytes.
+Going bigger than the lowest MTU on a network will either result in IP
+fragmentation, or the need to do path MTU detection. Both of which have
+their own sets of problems. Even if sometimes large OS vendors dropped
+the default MTU to even lower at times.</p>
+</blockquote>
 </body>
 </html>
