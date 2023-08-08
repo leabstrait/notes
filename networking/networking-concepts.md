@@ -65,7 +65,7 @@ Finding a device with a unique MAC address in a network is done by sending reque
 
 **TTL - Time to Live** - this gives the count of how many hops a packet can survive. **TTL** is decreased by 1 every hop. TTL is needed because without it the packets might hop from router to router indefinitely.
 
-*Note [Optimization]* Keeping your server and database in the same subnet will be more efficient than those two being in separate subnets. Because the subnets are usually connected by a router (the routers live in both networks), if the router is congested, we are gonna see delays. Instead, we can use a switch in between the database and the backend.
+_Note [Optimization]_ Keeping your server and database in the same subnet will be more efficient than those two being in separate subnets. Because the subnets are usually connected by a router (the routers live in both networks), if the router is congested, we are gonna see delays. Instead, we can use a switch in between the database and the backend.
 
 ## Network Layer / Internet Layer
 
@@ -107,6 +107,22 @@ Capturing DNS server requests and responses using `tcpdump`:
 -   `nslookup google.com 8.8.8.8`
 -   `tcpdump -n -v -i wlp3s0 src 8.8.8.8 or dst 8.8.8.8`
 
+```
+tcpdump: listening on wlp3s0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+
+16:26:29.543518 IP (tos 0x0, ttl 64, id 17495, offset 0, flags [none], proto UDP (17), length 56)
+    192.168.0.36.59200 > 8.8.8.8.53: 30104+ A? google.com. (28)
+
+16:26:29.560006 IP (tos 0x0, ttl 121, id 35261, offset 0, flags [none], proto UDP (17), length 72)
+    8.8.8.8.53 > 192.168.0.36.59200: 30104 1/0/0 google.com. A 172.217.169.14 (44)
+
+16:26:29.560504 IP (tos 0x0, ttl 64, id 20170, offset 0, flags [none], proto UDP (17), length 56)
+    192.168.0.36.36072 > 8.8.8.8.53: 1041+ AAAA? google.com. (28)
+
+16:26:29.590092 IP (tos 0x0, ttl 120, id 2066, offset 0, flags [none], proto UDP (17), length 84)
+    8.8.8.8.53 > 192.168.0.36.36072: 1041 1/0/0 google.com. AAAA 2a00:1450:4009:823::200e (56)
+```
+
 ### [TCP (Transmission Control Protocol)](https://en.wikipedia.org/wiki/Transmission_Control_Protocol)
 
 Similar to UDP, it's a Layer 4 protocol and can address processes in a host using ports. It 'controls' the transmission, unlike UDP which is like a firehose. Requires a connection before transmitting data. Connection is made using a 'handshake'. Hence it's stateful. Has 20 bytes header. Used for reliable communications like:
@@ -132,7 +148,111 @@ The Transmission Control Protocol differs in several key features compared to th
 -   **Retransmission of lost packets**: any cumulative stream not acknowledged is retransmitted
 -   **Error-free data transfer**: corrupted packets are treated as lost and are retransmitted
 -   **Flow control**: limits the rate a sender transfers data to guarantee reliable delivery. The receiver continually hints the sender on how much data can be received (receiver sends an **ACK** with its window size [max 64KB but can be scaled up with the window scaling factor (0-14), so that window size can go up to 1GB]). When the receiving host's buffer fills, the next acknowledgment suspends the transfer and allows the data in the buffer to be processed. Employs a **window sliding mechanism**.
--  **Congestion control**: the receiver might handle the load but the middle boxes (routers) might not. lost packets (presumed due to congestion) trigger a reduction in data delivery rate
+-   **Congestion control**: the receiver might handle the load but the middle boxes (routers) might not. lost packets (presumed due to congestion) trigger a reduction in data delivery rate
+
+Capturing TCP segments with `tcpdump`:
+
+-   `ping example.com`
+-   `tcpdump -n -v -i wlp3s0 src 93.184.216.34 or dst 93.184.216.34 and port 80`
+-   `curl example.com`
+
+```
+    tcpdump: listening on wlp3s0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+
+15:47:30.859589 IP (tos 0x0, ttl 64, id 33813, offset 0, flags [DF], proto TCP (6), length 60)
+    192.168.0.36.50584 > 93.184.216.34.80: Flags [S], cksum 0x8cea (correct), seq 3227649586, win 64240, options [mss 1460,sackOK,TS val 338897101 ecr 0,nop,wscale 7], length 0
+
+15:47:30.962271 IP (tos 0x0, ttl 51, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    93.184.216.34.80 > 192.168.0.36.50584: Flags [S.], cksum 0x314f (correct), seq 2019451891, ack 3227649587, win 65535, options [mss 1460,sackOK,TS val 2278814291 ecr 338897101,nop,wscale 9], length 0
+
+15:47:30.962345 IP (tos 0x0, ttl 64, id 33814, offset 0, flags [DF], proto TCP (6), length 52)
+    192.168.0.36.50584 > 93.184.216.34.80: Flags [.], cksum 0x5dc0 (correct), ack 1, win 502, options [nop,nop,TS val 338897204 ecr 2278814291], length 0
+
+15:47:30.962544 IP (tos 0x0, ttl 64, id 33815, offset 0, flags [DF], proto TCP (6), length 126)
+    192.168.0.36.50584 > 93.184.216.34.80: Flags [P.], cksum 0xcfb7 (correct), seq 1:75, ack 1, win 502, options [nop,nop,TS val 338897204 ecr 2278814291], length 74: HTTP, length: 74
+        GET / HTTP/1.1
+        Host: example.com
+        User-Agent: curl/8.2.1
+        Accept: */*
+
+15:47:31.069298 IP (tos 0x0, ttl 51, id 40104, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.80 > 192.168.0.36.50584: Flags [.], cksum 0x5e81 (correct), ack 75, win 128, options [nop,nop,TS val 2278814398 ecr 338897204], length 0
+
+15:47:31.070181 IP (tos 0x0, ttl 51, id 40105, offset 0, flags [none], proto TCP (6), length 1500)
+    93.184.216.34.80 > 192.168.0.36.50584: Flags [.], cksum 0x417a (correct), seq 1:1449, ack 75, win 128, options [nop,nop,TS val 2278814398 ecr 338897204], length 1448: HTTP, length: 1448
+        HTTP/1.1 200 OK
+        Age: 187681
+        Cache-Control: max-age=604800
+        Content-Type: text/html; charset=UTF-8
+        Date: Tue, 08 Aug 2023 14:47:30 GMT
+        Etag: "3147526947+ident"
+        Expires: Tue, 15 Aug 2023 14:47:30 GMT
+        Last-Modified: Thu, 17 Oct 2019 07:18:26 GMT
+        Server: ECS (nyb/1DCD)
+        Vary: Accept-Encoding
+        X-Cache: HIT
+        Content-Length: 1256
+
+        <!doctype html>
+        <html>
+        <head>
+            <title>Example Domain</title>
+
+            <meta charset="utf-8" />
+            <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <style type="text/css">
+            body {
+                background-color: #f0f0f2;
+                margin: 0;
+                padding: 0;
+                font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe     UI", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+            }
+            div {
+                width: 600px;
+                margin: 5em auto;
+                padding: 2em;
+                background-color: #fdfdff;
+                border-radius: 0.5em;
+                box-shadow: 2px 3px 7px 2px rgba(0,0,0,0.02);
+            }
+            a:link, a:visited {
+                color: #38488f;
+                text-decoration: none;
+            }
+            @media (max-width: 700px) {
+                div {
+                    margin: 0 auto;
+                    width: auto;
+                }
+            }
+            </style>
+        </head>
+        <body>
+        <div>
+            <h1>Example Domain</h1>
+            <p>This domain is for use in illustrative examples in documents. You may use this
+            domain in literature without prior coord [|http]
+
+15:47:31.070244 IP (tos 0x0, ttl 64, id 33816, offset 0, flags [DF], proto TCP (6), length 52)
+    192.168.0.36.50584 > 93.184.216.34.80: Flags [.], cksum 0x5700 (correct), ack 1449, win 493, options [nop,nop,TS val 338897312 ecr 2278814398], length 0
+
+15:47:31.071358 IP (tos 0x0, ttl 51, id 40106, offset 0, flags [none], proto TCP (6), length 195)
+    93.184.216.34.80 > 192.168.0.36.50584: Flags [P.], cksum 0x7a43 (correct), seq 1449:1592, ack 75, win 128, options [nop,nop,TS val 2278814398 ecr 338897204], length 143: HTTP
+
+15:47:31.071371 IP (tos 0x0, ttl 64, id 33817, offset 0, flags [DF], proto TCP (6), length 52)
+    192.168.0.36.50584 > 93.184.216.34.80: Flags [.], cksum 0x5668 (correct), ack 1592, win 501, options [nop,nop,TS val 338897313 ecr 2278814398], length 0
+
+15:47:31.071573 IP (tos 0x0, ttl 64, id 33818, offset 0, flags [DF], proto TCP (6), length 52)
+    192.168.0.36.50584 > 93.184.216.34.80: Flags [F.], cksum 0x5667 (correct), seq 75, ack 1592, win 501, options [nop,nop,TS val 338897313 ecr 2278814398], length 0
+
+15:47:31.177303 IP (tos 0x0, ttl 51, id 40107, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.80 > 192.168.0.36.50584: Flags [F.], cksum 0x576f (correct), seq 1592, ack 76, win 128, options [nop,nop,TS val 2278814506 ecr 338897313], length 0
+
+15:47:31.177343 IP (tos 0x0, ttl 64, id 33819, offset 0, flags [DF], proto TCP (6), length 52)
+    192.168.0.36.50584 > 93.184.216.34.80: Flags [.], cksum 0x5590 (correct), ack 1593, win 501, options [nop,nop,TS val 338897419 ecr 2278814506], length 0
+```
 
 #### TCP States
 
@@ -152,14 +272,21 @@ By definition TCP is a stateful protocol and it has states. Both client and serv
 | TIME-WAIT    | Server or client  | Waiting for enough time to pass to be sure that all remaining packets on the connection have expired.                                                                           |
 | CLOSED       | Server and client | No connection state at all.                                                                                                                                                     |
 
-
 When the server sends the last **fin**, the client after receiving it sends the last **ack** to the server. The server can now **CLOSE**. Basically there is no further communication from the server. The client doesn't really know if the server received the **ack** or not (also called the [Two Generals' Problem](https://en.wikipedia.org/wiki/Two_Generals%27_Problem)). The client now goes into a **TIME_WAIT** state, which is 4 minutes [`2 MSL(Maximum Segment Length)`].
 
 ![TCP Socket States](files/networking-concepts/tcp-socket-states.png)
 
-*Note [Optimization]* Whoever requests the **fin** will end up in the **TIME_WAIT** state. We wouldn't want the server to be flooded with these waits when closing connections. If you own the frontend and the backend, you can design a protocol such that you send a request so that the client can instantiate the **fin** for you. The client will be in the **TIME_WAIT** state, which will free up the server.
+_Note [Optimization]_ Whoever requests the **fin** will end up in the **TIME_WAIT** state. We wouldn't want the server to be flooded with these waits when closing connections. If you own the frontend and the backend, you can design a protocol such that you send a request so that the client can instantiate the **fin** for you. The client will be in the **TIME_WAIT** state, which will free up the server.
 
-## NAT (Network Address Translation)
+#### TCP Cons
+
+While TCP is a reliable protocol for connections it has some disadvantages.
+
+-   [Head of Line Blocking](https://en.wikipedia.org/wiki/Head-of-line_blocking): Head-of-line blocking in TCP occurs when a packet loss or delay in a network causes subsequent packets to be held up, hindering their delivery even if they're ready to be sent.
+
+-   [TCP Meltdown](https://www.youtube.com/watch?v=AAssk2N_oPk&ab_channel=Computerphile): TCP Meltdown occurs when you stack one transmission protocol on top of another, like what happens when an OpenVPN TCP tunnel is transporting TCP traffic inside it.
+
+### NAT (Network Address Translation)
 
 IPV4 has a limit of 4 billion addresses which is not enough considering the number of devices connected to the Internet. IPV6 also solves this issue but for IPV4 addressing, NAT allows multiples of devices to access the internet while also remaining private inside a network. It gives one public IP address (the gateway) and multiple private addresses for internal use.
 
@@ -173,7 +300,7 @@ Applications:
 -   Port forwarding: Add a NAT entry in the router to forward packets to 80 to a machine (any port, maybe 8080) in your LAN. No need to have root access to listen on port 80 on your device. Expose your local web server publicly
 -   Layer 4 Load Balancing: [HAProxy NAT Mode](https://www.haproxy.com/blog/layer-4-load-balancing-nat-mode) - Your load balancer is your gateway. The gateway has an entry from a bogus IP (e.g. 100.100.100.100) to multiple machines in the internal network. Clients send a request to the bogus service IP. The router intercepts that packet and replaces the service IP with a destination server. Layer 4 reverse proxying
 
-## Maximum Segment Size
+### Maximum Segment Size
 
 [MSS (maximum segment size)](https://www.cloudflare.com/learning/network-layer/what-is-mss/) limits the size of packets, or small chunks of data, that travel across a network. MSS measures the non-header portion of a packet, which is called the payload. MSS is determined by another metric that has to do with packet size: [MTU (maximum transmission unit)](https://www.cloudflare.com/learning/network-layer/what-is-mtu/), which does include the TCP and IP (Internet Protocol) headers.
 
@@ -182,7 +309,6 @@ Essentially, the MSS is equal to MTU minus the size of a TCP header and an IP he
 $$ MTU - (TCP header + IP header) = MSS $$
 
 ![A data packet](files/networking-concepts/data-packet.png)
-
 
 One of the key differences between MTU and MSS is that if a packet exceeds a device's MTU, it is broken up into smaller pieces, or "fragmented." In contrast, if a packet exceeds the MSS, it is dropped and not delivered.
 
