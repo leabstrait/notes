@@ -173,7 +173,10 @@
 </header>
 <h2 id="slides">Slides</h2>
 <p><a
-href="files/networking-concepts/Fundamentals+of+Networking+for+Effective+Backends-v5.pdf">Slides</a></p>
+href="files/networking-concepts/Fundamentals+of+Networking+for+Effective+Backends-v5.pdf">Slides</a>
+from <a
+href="https://www.udemy.com/course/fundamentals-of-networking-for-effective-backend-design/">Hussein
+Nasser’s Networking Course</a></p>
 <h2 id="standard-communication-models-for-networking">Standard
 communication models for Networking</h2>
 <p>A standard model allows decoupling, so that the layers can be worked
@@ -668,5 +671,95 @@ fragmentation, or the need to do path MTU detection. Both of which have
 their own sets of problems. Even if sometimes large OS vendors dropped
 the default MTU to even lower at times.</p>
 </blockquote>
+<h2 id="application-layer">Application Layer</h2>
+<h2 id="popular-networking-protocols">Popular Networking Protocols</h2>
+<h3 id="domain-name-system-dns">Domain Name System (DNS)</h3>
+<p>IP addresses are essential for transmitting IP packets, forming the
+foundation of network communications, while DNS serves the purpose of
+converting hostnames (text) into IP addresses (numbers). Hostnames can
+remain unchanged even if IP addresses change, and a single service can
+have multiple IP addresses. DNS facilitates the selection of the most
+suitable IP address(es) based on factors like geographic proximity and
+lower server loads, ensuring optimal performance. DNS is built on top of
+UDP.</p>
+<p>Beyond IP addresses, DNS contains various types of information:</p>
+<ul>
+<li>A Record (Address Record): Associates hostnames with IPv4
+addresses.</li>
+<li>AAAA Record: Links hostnames to IPv6 addresses.</li>
+<li>CNAME Record (Canonical Name Record): Establishes aliases for
+hostnames, often utilized for subdomains.</li>
+<li>MX Record (Mail Exchanger Record): Specifies mail servers for
+receiving domain email.</li>
+<li>NS Record (Name Server Record): Identifies authoritative name
+servers for a domain.</li>
+<li>TXT Record (Text Record): Stores diverse text-based data for
+different uses.</li>
+</ul>
+<p>These are some of the more well-known records. <a
+href="https://www.cloudflare.com/en-gb/learning/dns/dns-records/">Learn
+more</a></p>
+<p>All DNS records incorporate a ‘TTL’ (Time-to-Live), indicating how
+often a DNS server refreshes that record.</p>
+<p>The DNS resolution process involves multiple steps:</p>
+<ol type="1">
+<li><strong>Local Caching</strong>: The device checks its cache for the
+requested domain’s IP address.</li>
+<li><strong>Recursive Query</strong>: If not cached, the device asks a
+DNS resolver (ISP or public service).</li>
+<li><strong>Iterative Queries</strong>: The resolver seeks root and TLD
+servers for info about the domain.</li>
+<li><strong>Authoritative Query</strong>: The resolver queries the
+domain’s authoritative name server.</li>
+<li><strong>Response to Resolver</strong>: Authoritative server responds
+with the IP address.</li>
+<li><strong>Resolver Response</strong>: Resolver sends the IP to the
+client.</li>
+<li><strong>Client Access</strong>: Client connects to the web server
+and requests content.</li>
+<li><strong>Optional Caching</strong>: Resolver may cache the IP for
+future use.</li>
+</ol>
+<p>The DNS structure comprises distinct layers—DNS recursor, Root
+nameserver, TLD nameserver, and Authoritative nameserver—intentionally
+designed for distribution, except for the centralized Authoritative
+nameserver. This design is crucial due to DNS being the most queried
+system.</p>
+<p>However, DNS lacks inherent encryption, enabling ISPs to view all DNS
+traffic. This unencrypted exposure elevates the risk of potential
+vulnerabilities, including DNS hijacking, redirecting users to malicious
+sites, and DNS poisoning, inserting false data into DNS queries. As a
+result, attackers can exploit these openings. To address these security
+risks, DNS over TLS (DoT) and DNS over HTTPS (DoH) protocols aim to
+introduce encryption.</p>
+<p>DNS querying using <code>nslookup</code></p>
+<ul>
+<li><code>nslookup labinojha.com.np</code></li>
+<li><code>nslookup labinojha.com.np 8.8.8.8   # non-authoritative</code></li>
+<li><code>nslookup -type=A labinojha.com.np</code></li>
+<li><code>nslookup -type=txt labinojha.com.np</code></li>
+<li><code>nslookup -type=ns labinojha.com.np</code></li>
+<li><code>nslookup labinojha.com.np may.ns.cloudflare.com  # authoritative name server</code></li>
+</ul>
+<p><code>dig</code> is another tool that can be used.</p>
+<h3 id="transport-layer-security-tls">Transport Layer Security
+(TLS)</h3>
+<p>Fundamental encryption for network communication. Primarily used for
+securing HTTP, extends to email, messaging, VoIP.</p>
+<p>Derived from SSL, initially SSL 3.1. “TLS” and “SSL” terms used
+interchangeably due to history.</p>
+<p>HTTPS implements TLS atop HTTP. SSL/TLS certificates ensure secure
+connections.</p>
+<p>SSL certificates involve public and private keys. TLS handshake
+establishes connection, cipher suites, session keys.</p>
+<p>Servers authenticate during handshake using public keys. Public key
+cryptography ensures authenticity, session keys matched by TLS. Data
+encrypted, authenticated, and signed with MAC. MAC guarantees data
+integrity, like tamper-proof seals.</p>
+<figure>
+<img src="files/networking-concepts/tcp-handshake-tls.png"
+alt="The TCP Handshake with TLS" />
+<figcaption aria-hidden="true">The TCP Handshake with TLS</figcaption>
+</figure>
 </body>
 </html>
