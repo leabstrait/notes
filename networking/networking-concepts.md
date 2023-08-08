@@ -5,7 +5,7 @@ bibliography: "../references.bib"
 
 ## Slides
 
-[Slides](files/networking-concepts/Fundamentals+of+Networking+for+Effective+Backends-v5.pdf)
+[Slides](files/networking-concepts/Fundamentals+of+Networking+for+Effective+Backends-v5.pdf) from [Hussein Nasser's Networking Course](https://www.udemy.com/course/fundamentals-of-networking-for-effective-backend-design/)
 
 ## Standard communication models for Networking
 
@@ -315,3 +315,64 @@ One of the key differences between MTU and MSS is that if a packet exceeds a dev
 The maximum MTU of the internet is 1500 bytes, and the maximum MSS is 1460 bytes.
 
 > Since then various other transmission systems have come and gone, but the lowest MTU value of them has still been Ethernet at 1500 bytes. Going bigger than the lowest MTU on a network will either result in IP fragmentation, or the need to do path MTU detection. Both of which have their own sets of problems. Even if sometimes large OS vendors dropped the default MTU to even lower at times.
+
+## Application Layer
+
+## Popular Networking Protocols
+
+### Domain Name System (DNS)
+
+IP addresses are essential for transmitting IP packets, forming the foundation of network communications, while DNS serves the purpose of converting hostnames (text) into IP addresses (numbers). Hostnames can remain unchanged even if IP addresses change, and a single service can have multiple IP addresses. DNS facilitates the selection of the most suitable IP address(es) based on factors like geographic proximity and lower server loads, ensuring optimal performance. DNS is built on top of UDP.
+
+Beyond IP addresses, DNS contains various types of information:
+
+-   A Record (Address Record): Associates hostnames with IPv4 addresses.
+-   AAAA Record: Links hostnames to IPv6 addresses.
+-   CNAME Record (Canonical Name Record): Establishes aliases for hostnames, often utilized for subdomains.
+-   MX Record (Mail Exchanger Record): Specifies mail servers for receiving domain email.
+-   NS Record (Name Server Record): Identifies authoritative name servers for a domain.
+-   TXT Record (Text Record): Stores diverse text-based data for different uses.
+
+These are some of the more well-known records. [Learn more](https://www.cloudflare.com/en-gb/learning/dns/dns-records/)
+
+All DNS records incorporate a 'TTL' (Time-to-Live), indicating how often a DNS server refreshes that record.
+
+The DNS resolution process involves multiple steps:
+
+1. **Local Caching**: The device checks its cache for the requested domain's IP address.
+2. **Recursive Query**: If not cached, the device asks a DNS resolver (ISP or public service).
+3. **Iterative Queries**: The resolver seeks root and TLD servers for info about the domain.
+4. **Authoritative Query**: The resolver queries the domain's authoritative name server.
+5. **Response to Resolver**: Authoritative server responds with the IP address.
+6. **Resolver Response**: Resolver sends the IP to the client.
+7. **Client Access**: Client connects to the web server and requests content.
+8. **Optional Caching**: Resolver may cache the IP for future use.
+
+
+The DNS structure comprises distinct layers—DNS recursor, Root nameserver, TLD nameserver, and Authoritative nameserver—intentionally designed for distribution, except for the centralized Authoritative nameserver. This design is crucial due to DNS being the most queried system.
+
+However, DNS lacks inherent encryption, enabling ISPs to view all DNS traffic. This unencrypted exposure elevates the risk of potential vulnerabilities, including DNS hijacking, redirecting users to malicious sites, and DNS poisoning, inserting false data into DNS queries. As a result, attackers can exploit these openings. To address these security risks, DNS over TLS (DoT) and DNS over HTTPS (DoH) protocols aim to introduce encryption.
+
+DNS querying using `nslookup`
+
+-   ` nslookup labinojha.com.np`
+-   ` nslookup labinojha.com.np 8.8.8.8   # non-authoritative`
+-   ` nslookup -type=A labinojha.com.np`
+-   ` nslookup -type=txt labinojha.com.np`
+-   ` nslookup -type=ns labinojha.com.np`
+-   `nslookup labinojha.com.np may.ns.cloudflare.com  # authoritative name server`
+
+`dig` is another tool that can be used.
+
+### Transport Layer Security (TLS)
+Fundamental encryption for network communication. Primarily used for securing HTTP, extends to email, messaging, VoIP.
+
+Derived from SSL, initially SSL 3.1. "TLS" and "SSL" terms used interchangeably due to history.
+
+HTTPS implements TLS atop HTTP. SSL/TLS certificates ensure secure connections.
+
+SSL certificates involve public and private keys. TLS handshake establishes connection, cipher suites, session keys.
+
+Servers authenticate during handshake using public keys. Public key cryptography ensures authenticity, session keys matched by TLS. Data encrypted, authenticated, and signed with MAC. MAC guarantees data integrity, like tamper-proof seals.
+
+![The TCP Handshake with TLS](files/networking-concepts/tcp-handshake-tls.png)
