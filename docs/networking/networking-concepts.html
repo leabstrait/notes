@@ -258,6 +258,10 @@ backend.</p>
 Layer</h2>
 <p><a href="https://en.wikipedia.org/wiki/Internet_Protocol">IP</a> is
 the network layer communications protocol.</p>
+<figure>
+<img src="files/networking-concepts/ip-packet.png" alt="IP packet" />
+<figcaption aria-hidden="true">IP packet</figcaption>
+</figure>
 <p>IP Addresses are a layer 3 property. Can be set automatically or
 statically, has <strong>network</strong> and <strong>host</strong>
 portions. 4 bytes in IPv4 - 32 bits.</p>
@@ -273,6 +277,11 @@ Message Protocol)</h3>
 messages and operational information indicating success or failure when
 communicating with another IP address. It is used by ping and
 traceroute.</p>
+<figure>
+<img src="files/networking-concepts/icmp-header.png"
+alt="ICMP Header" />
+<figcaption aria-hidden="true">ICMP Header</figcaption>
+</figure>
 <ul>
 <li><code>ping google.com</code></li>
 <li><code>traceroute google.com</code></li>
@@ -295,6 +304,11 @@ Used for:</p>
 <li>Games</li>
 <li>P2P</li>
 </ul>
+<figure>
+<img src="files/networking-concepts/udp-datagram-header.png"
+alt="UDP Datagram Header" />
+<figcaption aria-hidden="true">UDP Datagram Header</figcaption>
+</figure>
 <p>Multiplexing (many to one) and demultiplexing (one to many). IP
 targets hosts only. Each host can have multiple applications running.
 Ports can be used to identify the ‘apps’ or ‘processes’. The sender
@@ -344,6 +358,11 @@ built on top of QUIC which is built on top of UDP and aims to be better
 than TCP)</li>
 <li>Any bidirectional communication</li>
 </ul>
+<figure>
+<img src="files/networking-concepts/tcp-segment.png"
+alt="TCP Segment" />
+<figcaption aria-hidden="true">TCP Segment</figcaption>
+</figure>
 <p>TCP Connection is a Layer 5 (session) concept. The connection between
 client and server must be there to send data, can’t send data outside of
 a connection, requires a 3-way TCP handshake.</p>
@@ -705,10 +724,61 @@ host sends back an ICMP message indicating fragmentation is needed(Type
 set), which will lower the MTU. Path MTU can discover the network’s
 lowest MTU with ICMP.</p>
 <figure>
-<img src="files/networking-concepts/image.png"
+<img src="files/networking-concepts/path-mtud.png"
 alt="Path MTU Discovery" />
 <figcaption aria-hidden="true">Path MTU Discovery</figcaption>
 </figure>
+<h3 id="nagles-algorithm-and-delayed-acknowledgement">Nagle’s Algorithm
+and Delayed Acknowledgement</h3>
+<p>In the telnet days, most keypresses generated a single byte of data
+that is transmitted immediately. Since TCP packets have a 40-byte header
+(20 bytes for TCP, 20 bytes for IPv4), this results in a 41-byte packet
+for 1 byte of useful information, a huge overhead. To solve this waste
+<strong>Nagle’s Algorithm</strong> combines small segments and send them
+as one. The client can wait for a full MSS before sending the
+segment.</p>
+<pre><code>Nagles Algortihm
+
+
+if there is new data to send then
+    if the window size ≥ MSS and available data is ≥ MSS then
+        send complete MSS segment now
+    else
+        if there is unconfirmed data still in the pipe then
+            enqueue data in the buffer until an acknowledge is received
+        else
+            send data immediately
+        end if
+    end if
+end if</code></pre>
+<p>The wait can be perceived as a delay in the client side. The problem
+with Nagle’s algorithm arises when sending substantial data, leading to
+delays, such as attempting to transmit 5000 bytes using a 1460 MSS; the
+first three full segments are 1460 bytes each, leaving 620 bytes, and
+interestingly, the fourth segment, even though not full, is only sent
+upon receiving an acknowledgment (ACK).</p>
+<figure>
+<img src="files/networking-concepts/nagle-large-data.png"
+alt="Nagle’s Algortithm on large data" />
+<figcaption aria-hidden="true">Nagle’s Algortithm on large
+data</figcaption>
+</figure>
+<p>Modern clients commonly disable Nagle’s algorithm, favoring
+performance over minimal bandwidth conservation. This is achieved
+through options like <code>TCP_NODELAY</code>. For instance, Curl
+disabled Nagle’s algorithm by default in 2016 due to its negative impact
+on the TLS handshake process. More details can be found in this <a
+href="https://github.com/curl/curl/commit/4732ca5724072f132876f520c8f02c7c5b654d9">commit</a>.</p>
+<p><strong>Dealyed Acknowledgement</strong></p>
+<p>It may be a waste to acknowledge segments right away, sending an ack
+for each segment. We can wait little more to receive more segment and
+ack once</p>
+<p>However there are problems with delayed ACK. Causes delays in some
+clients that may lead to timeout and retransmission. Noticeable
+performance degradation. Combined with Nagle’s algorithm can lead to
+400ms delays as each party is waiting on each other.</p>
+<p>Delayed ack algorithm can be disabled with <code>TCP_QUICKACK</code>
+option, this way segments will be acknowledged ‘quicker’.</p>
 <h2 id="application-layer">Application Layer</h2>
 <h2 id="popular-networking-protocols">Popular Networking Protocols</h2>
 <h3 id="domain-name-system-dns">Domain Name System (DNS)</h3>
