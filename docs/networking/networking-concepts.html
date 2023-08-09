@@ -638,16 +638,29 @@ internal network. Clients send a request to the bogus service IP. The
 router intercepts that packet and replaces the service IP with a
 destination server. Layer 4 reverse proxying</li>
 </ul>
-<h3 id="maximum-segment-size">Maximum Segment Size</h3>
+<h3
+id="maximum-segment-size-mss-and-maximum-transmission-unit-mtu">Maximum
+Segment Size (MSS) and Maximum Transmission Unit (MTU)</h3>
 <p><a
 href="https://www.cloudflare.com/learning/network-layer/what-is-mss/">MSS
-(maximum segment size)</a> limits the size of packets, or small chunks
-of data, that travel across a network. MSS measures the non-header
-portion of a packet, which is called the payload. MSS is determined by
-another metric that has to do with packet size: <a
+(Maximum Segment Size)</a> acts as a limiting factor for the size of
+packets or small data chunks that traverse a network. It focuses on
+measuring the payload—the non-header portion—of a packet. The value of
+MSS is intricately linked to another key parameter concerning packet
+dimensions: <a
 href="https://www.cloudflare.com/learning/network-layer/what-is-mtu/">MTU
-(maximum transmission unit)</a>, which does include the TCP and IP
-(Internet Protocol) headers.</p>
+(Maximum Transmission Unit)</a>, which includes the TCP and IP (Internet
+Protocol) headers.</p>
+<p>The layer 4 unit is ‘segment’. The segment slides into an ‘IP Packet’
+in layer 3. The IP Packet now has the segment + headers. The IP Packet
+slides into a layer 2 ‘frame’. The frame has a fixed size based on the
+networking configuration. The size of the frame determines the size of
+the segment. Maximum Transmission Unit (MTU) is the size of the frame.
+It is a network interface property(default 1500). The larger the frame
+size, the lower the latency. If you can fit more data into a single
+segment you lower latency, it lowers overhead from headers and
+processing. Some networks have jumbo frames up to 9000 bytes. Are there
+are networks with larger MTUs?</p>
 <p>Essentially, the MSS is equal to MTU minus the size of a TCP header
 and an IP header:</p>
 <p><span
@@ -657,10 +670,16 @@ class="math display"><em>M</em><em>T</em><em>U</em> − (<em>T</em><em>C</em
 alt="A data packet" />
 <figcaption aria-hidden="true">A data packet</figcaption>
 </figure>
+<figure>
+<img src="files/networking-concepts/data-frame.png" alt="Data Frame" />
+<figcaption aria-hidden="true">Data Frame</figcaption>
+</figure>
 <p>One of the key differences between MTU and MSS is that if a packet
 exceeds a device’s MTU, it is broken up into smaller pieces, or
-“fragmented.” In contrast, if a packet exceeds the MSS, it is dropped
-and not delivered.</p>
+“fragmented.” These frames then have to be assembled and then the frame
+itself has to have ‘More Fragments (MF)’ bit set in it’s flags. In
+contrast, if a packet exceeds the MSS, it is dropped and not
+delivered.</p>
 <p>The maximum MTU of the internet is 1500 bytes, and the maximum MSS is
 1460 bytes.</p>
 <blockquote>
@@ -671,6 +690,25 @@ fragmentation, or the need to do path MTU detection. Both of which have
 their own sets of problems. Even if sometimes large OS vendors dropped
 the default MTU to even lower at times.</p>
 </blockquote>
+<p>Check MTU in a linux machine</p>
+<ul>
+<li><code>ip a | grep -i mtu</code></li>
+</ul>
+<p><strong>Path MTU Discovery (PMTUD)</strong></p>
+<p>MTU is a network interface property; each host can have a different
+value. You really need to use the smallest MTU in the network. Path MTU
+helps determine the MTU on the network path. The client sends an IP
+packet with its MTU(in the options field of the IP header) and a DF
+flag. The host with a smaller MTU will need to fragment but can’t. The
+host sends back an ICMP message indicating fragmentation is needed(Type
+3 – Destination Unreachable: Code 4 Fragmentation required, and DF flag
+set), which will lower the MTU. Path MTU can discover the network’s
+lowest MTU with ICMP.</p>
+<figure>
+<img src="files/networking-concepts/image.png"
+alt="Path MTU Discovery" />
+<figcaption aria-hidden="true">Path MTU Discovery</figcaption>
+</figure>
 <h2 id="application-layer">Application Layer</h2>
 <h2 id="popular-networking-protocols">Popular Networking Protocols</h2>
 <h3 id="domain-name-system-dns">Domain Name System (DNS)</h3>
