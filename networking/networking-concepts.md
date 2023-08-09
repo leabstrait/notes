@@ -71,6 +71,8 @@ _Note [Optimization]_ Keeping your server and database in the same subnet will b
 
 [IP](https://en.wikipedia.org/wiki/Internet_Protocol) is the network layer communications protocol.
 
+![IP packet](files/networking-concepts/ip-packet.png)
+
 IP Addresses are a layer 3 property. Can be set automatically or statically, has **network** and **host** portions. 4 bytes in IPv4 - 32 bits.
 
 -   a.b.c.d/x (a, b, c, d, x are integers). x is the network bits, remaining are the host. [CIDR Notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
@@ -78,6 +80,8 @@ IP Addresses are a layer 3 property. Can be set automatically or statically, has
 ### ICMP (Internet Control Message Protocol)
 
 It is used by network devices, including routers, to send error messages and operational information indicating success or failure when communicating with another IP address. It is used by ping and traceroute.
+
+![ICMP Header](files/networking-concepts/icmp-header.png)
 
 -   `ping google.com`
 -   `traceroute google.com`
@@ -95,6 +99,8 @@ Layer 4 protocol, sits on top of the IP protocol (Network layer). While IP can a
 -   WebRTC uses UDP. Websockets, on the other hand, use TCP
 -   Games
 -   P2P
+
+![UDP Datagram Header](files/networking-concepts/udp-datagram-header.png)
 
 Multiplexing (many to one) and demultiplexing (one to many). IP targets hosts only. Each host can have multiple applications running. Ports can be used to identify the 'apps' or 'processes'. The sender multiplexes all inputs into single IP packets into UDP, and the receiver demultiplexes UDP datagrams in IP packets to each app or process. A four-tuple (Source IP, Source Port, Destination IP, Destination Port) can represent every communication between two devices.
 
@@ -131,6 +137,8 @@ Similar to UDP, it's a Layer 4 protocol and can address processes in a host usin
 -   Database Connections
 -   Web Communications (HTTP1, HTTP2 is built on top of TCP, HTTP3 is built on top of QUIC which is built on top of UDP and aims to be better than TCP)
 -   Any bidirectional communication
+
+![TCP Segment](files/networking-concepts/tcp-segment.png)
 
 TCP Connection is a Layer 5 (session) concept. The connection between client and server must be there to send data, can't send data outside of a connection, requires a 3-way TCP handshake.
 
@@ -330,7 +338,34 @@ Check MTU in a linux machine
 MTU is a network interface property; each host can have a different value. You really need to use the smallest MTU in the network. Path MTU helps determine the MTU on the network path. The client sends an IP packet with its MTU(in the options field of the IP header) and a DF flag. The host with a smaller MTU will need to fragment but can't. The host sends back an ICMP message indicating fragmentation is needed(Type 3 – Destination Unreachable: Code 4 Fragmentation required, and DF flag set), which will lower the MTU. Path MTU can discover the network's lowest MTU with ICMP.
 
 
-![Path MTU Discovery](files/networking-concepts/image.png)
+![Path MTU Discovery](files/networking-concepts/path-mtud.png)
+
+### Nagle's Algorithm
+
+In the telnet days, most keypresses generated a single byte of data that is transmitted immediately. Since TCP packets have a 40-byte header (20 bytes for TCP, 20 bytes for IPv4), this results in a 41-byte packet for 1 byte of useful information, a huge overhead. To solve this waste Nagle's Algortim combines small segments and send them as one. The client can wait for a full MSS before sending the segment.
+
+```
+Nagles Algortihm
+
+
+if there is new data to send then
+    if the window size ≥ MSS and available data is ≥ MSS then
+        send complete MSS segment now
+    else
+        if there is unconfirmed data still in the pipe then
+            enqueue data in the buffer until an acknowledge is received
+        else
+            send data immediately
+        end if
+    end if
+end if
+```
+
+The wait can be perceived as a delay in the client side. The problem with Nagle's algorithm arises when sending substantial data, leading to delays, such as attempting to transmit 5000 bytes using a 1460 MSS; the first three full segments are 1460 bytes each, leaving 620 bytes, and interestingly, the fourth segment, even though not full, is only sent upon receiving an acknowledgment (ACK).
+
+![Nagle's Algortithm on large data](files/networking-concepts/nagle-large-data.png)
+
+Modern clients commonly disable Nagle's algorithm, favoring performance over minimal bandwidth conservation. This is achieved through options like `TCP_NODELAY`. For instance, Curl disabled Nagle's algorithm by default in 2016 due to its negative impact on the TLS handshake process. More details can be found in this [commit](https://github.com/curl/curl/commit/4732ca5724072f132876f520c8f02c7c5b654d9).
 
 ## Application Layer
 
