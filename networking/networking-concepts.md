@@ -337,12 +337,11 @@ Check MTU in a linux machine
 
 MTU is a network interface property; each host can have a different value. You really need to use the smallest MTU in the network. Path MTU helps determine the MTU on the network path. The client sends an IP packet with its MTU(in the options field of the IP header) and a DF flag. The host with a smaller MTU will need to fragment but can't. The host sends back an ICMP message indicating fragmentation is needed(Type 3 – Destination Unreachable: Code 4 Fragmentation required, and DF flag set), which will lower the MTU. Path MTU can discover the network's lowest MTU with ICMP.
 
-
 ![Path MTU Discovery](files/networking-concepts/path-mtud.png)
 
-### Nagle's Algorithm
+### Nagle's Algorithm and Delayed Acknowledgement
 
-In the telnet days, most keypresses generated a single byte of data that is transmitted immediately. Since TCP packets have a 40-byte header (20 bytes for TCP, 20 bytes for IPv4), this results in a 41-byte packet for 1 byte of useful information, a huge overhead. To solve this waste Nagle's Algortim combines small segments and send them as one. The client can wait for a full MSS before sending the segment.
+In the telnet days, most keypresses generated a single byte of data that is transmitted immediately. Since TCP packets have a 40-byte header (20 bytes for TCP, 20 bytes for IPv4), this results in a 41-byte packet for 1 byte of useful information, a huge overhead. To solve this waste **Nagle's Algorithm** combines small segments and send them as one. The client can wait for a full MSS before sending the segment.
 
 ```
 Nagles Algortihm
@@ -366,6 +365,14 @@ The wait can be perceived as a delay in the client side. The problem with Nagle'
 ![Nagle's Algortithm on large data](files/networking-concepts/nagle-large-data.png)
 
 Modern clients commonly disable Nagle's algorithm, favoring performance over minimal bandwidth conservation. This is achieved through options like `TCP_NODELAY`. For instance, Curl disabled Nagle's algorithm by default in 2016 due to its negative impact on the TLS handshake process. More details can be found in this [commit](https://github.com/curl/curl/commit/4732ca5724072f132876f520c8f02c7c5b654d9).
+
+**Dealyed Acknowledgement**
+
+It may be a waste to acknowledge segments right away, sending an ack for each segment. We can wait little more to receive more segment and ack once
+
+However there are problems with delayed ACK. Causes delays in some clients that may lead to timeout and retransmission. Noticeable performance degradation. Combined with Nagle's algorithm can lead to 400ms delays as each party is waiting on each other.
+
+Delayed ack algorithm can be disabled with `TCP_QUICKACK` option, this way segments will be acknowledged 'quicker'.
 
 ## Application Layer
 
