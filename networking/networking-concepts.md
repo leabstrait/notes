@@ -369,10 +369,80 @@ Fundamental encryption for network communication. Primarily used for securing HT
 
 Derived from SSL, initially SSL 3.1. "TLS" and "SSL" terms used interchangeably due to history.
 
-HTTPS implements TLS atop HTTP. SSL/TLS certificates ensure secure connections.
 
-SSL certificates involve public and private keys. TLS handshake establishes connection, cipher suites, session keys.
+**HTTP (Hypertext Transfer Protocol):**
 
-Servers authenticate during handshake using public keys. Public key cryptography ensures authenticity, session keys matched by TLS. Data encrypted, authenticated, and signed with MAC. MAC guarantees data integrity, like tamper-proof seals.
+- Unencrypted protocol for data transmission over the web.
+- Data sent in plain text, susceptible to interception and eavesdropping.
 
-![The TCP Handshake with TLS](files/networking-concepts/tcp-handshake-tls.png)
+    ![HTTP TCP Handshake](files/networking-concepts/http-tcp-handshake.png)
+
+**HTTPS (Hypertext Transfer Protocol Secure):**
+
+- Secured version of HTTP.
+- Uses encryption to safeguard data during transmission.
+- Employs a handshake process to set up secure communication.
+
+    ![HTTPS TCP Handshake](files/networking-concepts/https-tcp-handshake.png)
+
+**Handshake and Key Exchange:**
+
+- During the handshake, the client and server agree on a symmetric encryption key for data encryption.
+- This key is used for both encryption and decryption.
+- The process uses asymmetric encryption for securely exchanging this symmetric key.
+
+**Asymmetric Encryption:**
+
+- Involves a public-private key pair.
+- Public key encrypts data, private key decrypts it.
+- Used for secure exchange of the symmetric encryption key during the handshake.
+
+**Symmetric Encryption:**
+
+- Same key for both encryption and decryption. SImple XORing the data with the key can be used to encrypt and decrypt the data.
+- Efficient for bulk data encryption.
+- Challenge lies in secure key exchange.
+
+**Certificate and Authentication:**
+
+- Server provides a digital certificate with its public key.
+- Certificate issued by a trusted Certificate Authority (CA). The certificate actually contains the public key of the server.
+- Allows the client to verify the server's identity.
+
+Modern cryptographic algorithms like AES are used for symmetric encryption in HTTPS, not XOR. - Asymmetric encryption is used mainly for key exchange, not for encrypting the actual data due to its speed overhead.
+
+**TLS 1.2**
+
+![TLS 1.2](files/networking-concepts/tls-1_2.png)
+
+TLS 1.2 relies on the RSA asymmetric encryption algorithm. Here's the handshake process in this version:
+
+
+This uses RSA which is a popular asymmetric encrytion algorithm.
+
+1. The client send a hello.
+2. The server  sends its public key which is the certificte.
+3. Theclient send the symmetric key, encrypted with the the servers public key
+4. The server decrypts with it's private key to get the symmetric key. Now both server and client have the symmetric key which they can use to encrypt and decrypt their communication.
+
+The TLS 1.2 handshake involves two round trips. However, a challenge with this approach is the absence of perfect [forward secrecy](https://en.wikipedia.org/wiki/Forward_secrecy). If a private key is compromised in the future, an attacker could potentially decrypt past sessions. This is why security certificates are periodically renewed.
+
+
+**Diffie-Hellman Key Exchange**
+Diffie-Hellman key exchange is used instead of RSA for achieving forward secrecy. This involves two private keys and one public key to generate a shared symmetric key.
+
+![Diffie Hellman](files/networking-concepts/diffie-hellman-1.png)
+![Diffie Hellman](files/networking-concepts/diffie-hellman-2.png)
+
+
+**TLS 1.3**
+![TLS 1.3](files/networking-concepts/tls-1_3.png)
+
+
+In TLS 1.3, the process is enhanced. Here's the updated handshake process:
+
+1. The client generates and combines a public-private key pair. It transmits both the public-private pair and the public key to the server.
+2. The server generates its own private key, combines it with the client's public key, and sends this pair to the client. Using these keys, the server can generate a symmetric key.
+3. The client, equipped with the keys from the server and its own pair, generates a symmetric key. This shared symmetric key enables secure communication between the client and the server.
+
+TLS 1.3 introduces several improvements, including the potential for a one-round-trip or even a zero-round-trip handshake, enhancing efficiency while maintaining strong security.
