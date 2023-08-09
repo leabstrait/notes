@@ -300,9 +300,12 @@ Applications:
 -   Port forwarding: Add a NAT entry in the router to forward packets to 80 to a machine (any port, maybe 8080) in your LAN. No need to have root access to listen on port 80 on your device. Expose your local web server publicly
 -   Layer 4 Load Balancing: [HAProxy NAT Mode](https://www.haproxy.com/blog/layer-4-load-balancing-nat-mode) - Your load balancer is your gateway. The gateway has an entry from a bogus IP (e.g. 100.100.100.100) to multiple machines in the internal network. Clients send a request to the bogus service IP. The router intercepts that packet and replaces the service IP with a destination server. Layer 4 reverse proxying
 
-### Maximum Segment Size
+### Maximum Segment Size (MSS) and Maximum Transmission Unit (MTU)
 
-[MSS (maximum segment size)](https://www.cloudflare.com/learning/network-layer/what-is-mss/) limits the size of packets, or small chunks of data, that travel across a network. MSS measures the non-header portion of a packet, which is called the payload. MSS is determined by another metric that has to do with packet size: [MTU (maximum transmission unit)](https://www.cloudflare.com/learning/network-layer/what-is-mtu/), which does include the TCP and IP (Internet Protocol) headers.
+[MSS (Maximum Segment Size)](https://www.cloudflare.com/learning/network-layer/what-is-mss/) acts as a limiting factor for the size of packets or small data chunks that traverse a network. It focuses on measuring the payload—the non-header portion—of a packet. The value of MSS is intricately linked to another key parameter concerning packet dimensions: [MTU (Maximum Transmission Unit)](https://www.cloudflare.com/learning/network-layer/what-is-mtu/), which includes the TCP and IP (Internet Protocol) headers.
+
+The layer 4 unit is 'segment'. The segment slides into an 'IP Packet' in layer 3. The IP Packet now has the segment + headers. The IP Packet slides into a layer 2 'frame'. The frame has a fixed size based on the networking configuration. The size of the frame determines the size of the segment. Maximum Transmission Unit (MTU) is the size of the frame. It is a network interface property(default 1500). The larger the frame size, the lower the latency. If you can fit more data into a single segment you lower latency, it lowers overhead from headers and processing.
+Some networks have jumbo frames up to 9000 bytes. Are there are networks with larger MTUs?
 
 Essentially, the MSS is equal to MTU minus the size of a TCP header and an IP header:
 
@@ -310,11 +313,24 @@ $$ MTU - (TCP header + IP header) = MSS $$
 
 ![A data packet](files/networking-concepts/data-packet.png)
 
-One of the key differences between MTU and MSS is that if a packet exceeds a device's MTU, it is broken up into smaller pieces, or "fragmented." In contrast, if a packet exceeds the MSS, it is dropped and not delivered.
+![Data Frame](files/networking-concepts/data-frame.png)
+
+One of the key differences between MTU and MSS is that if a packet exceeds a device's MTU, it is broken up into smaller pieces, or "fragmented." These frames then have to be assembled and then the frame itself has to have 'More Fragments (MF)' bit set in it's flags. In contrast, if a packet exceeds the MSS, it is dropped and not delivered.
 
 The maximum MTU of the internet is 1500 bytes, and the maximum MSS is 1460 bytes.
 
 > Since then various other transmission systems have come and gone, but the lowest MTU value of them has still been Ethernet at 1500 bytes. Going bigger than the lowest MTU on a network will either result in IP fragmentation, or the need to do path MTU detection. Both of which have their own sets of problems. Even if sometimes large OS vendors dropped the default MTU to even lower at times.
+
+Check MTU in a linux machine
+
+-   `ip a | grep -i mtu`
+
+**Path MTU Discovery (PMTUD)**
+
+MTU is a network interface property; each host can have a different value. You really need to use the smallest MTU in the network. Path MTU helps determine the MTU on the network path. The client sends an IP packet with its MTU(in the options field of the IP header) and a DF flag. The host with a smaller MTU will need to fragment but can't. The host sends back an ICMP message indicating fragmentation is needed(Type 3 – Destination Unreachable: Code 4 Fragmentation required, and DF flag set), which will lower the MTU. Path MTU can discover the network's lowest MTU with ICMP.
+
+
+![Path MTU Discovery](files/networking-concepts/image.png)
 
 ## Application Layer
 
@@ -348,7 +364,6 @@ The DNS resolution process involves multiple steps:
 7. **Client Access**: Client connects to the web server and requests content.
 8. **Optional Caching**: Resolver may cache the IP for future use.
 
-
 The DNS structure comprises distinct layers—DNS recursor, Root nameserver, TLD nameserver, and Authoritative nameserver—intentionally designed for distribution, except for the centralized Authoritative nameserver. This design is crucial due to DNS being the most queried system.
 
 However, DNS lacks inherent encryption, enabling ISPs to view all DNS traffic. This unencrypted exposure elevates the risk of potential vulnerabilities, including DNS hijacking, redirecting users to malicious sites, and DNS poisoning, inserting false data into DNS queries. As a result, attackers can exploit these openings. To address these security risks, DNS over TLS (DoT) and DNS over HTTPS (DoH) protocols aim to introduce encryption.
@@ -365,49 +380,49 @@ DNS querying using `nslookup`
 `dig` is another tool that can be used.
 
 ### Transport Layer Security (TLS)
+
 Fundamental encryption for network communication. Primarily used for securing HTTP, extends to email, messaging, VoIP.
 
 Derived from SSL, initially SSL 3.1. "TLS" and "SSL" terms used interchangeably due to history.
 
-
 **HTTP (Hypertext Transfer Protocol):**
 
-- Unencrypted protocol for data transmission over the web.
-- Data sent in plain text, susceptible to interception and eavesdropping.
+-   Unencrypted protocol for data transmission over the web.
+-   Data sent in plain text, susceptible to interception and eavesdropping.
 
     ![HTTP TCP Handshake](files/networking-concepts/http-tcp-handshake.png)
 
 **HTTPS (Hypertext Transfer Protocol Secure):**
 
-- Secured version of HTTP.
-- Uses encryption to safeguard data during transmission.
-- Employs a handshake process to set up secure communication.
+-   Secured version of HTTP.
+-   Uses encryption to safeguard data during transmission.
+-   Employs a handshake process to set up secure communication.
 
     ![HTTPS TCP Handshake](files/networking-concepts/https-tcp-handshake.png)
 
 **Handshake and Key Exchange:**
 
-- During the handshake, the client and server agree on a symmetric encryption key for data encryption.
-- This key is used for both encryption and decryption.
-- The process uses asymmetric encryption for securely exchanging this symmetric key.
+-   During the handshake, the client and server agree on a symmetric encryption key for data encryption.
+-   This key is used for both encryption and decryption.
+-   The process uses asymmetric encryption for securely exchanging this symmetric key.
 
 **Asymmetric Encryption:**
 
-- Involves a public-private key pair.
-- Public key encrypts data, private key decrypts it.
-- Used for secure exchange of the symmetric encryption key during the handshake.
+-   Involves a public-private key pair.
+-   Public key encrypts data, private key decrypts it.
+-   Used for secure exchange of the symmetric encryption key during the handshake.
 
 **Symmetric Encryption:**
 
-- Same key for both encryption and decryption. SImple XORing the data with the key can be used to encrypt and decrypt the data.
-- Efficient for bulk data encryption.
-- Challenge lies in secure key exchange.
+-   Same key for both encryption and decryption. SImple XORing the data with the key can be used to encrypt and decrypt the data.
+-   Efficient for bulk data encryption.
+-   Challenge lies in secure key exchange.
 
 **Certificate and Authentication:**
 
-- Server provides a digital certificate with its public key.
-- Certificate issued by a trusted Certificate Authority (CA). The certificate actually contains the public key of the server.
-- Allows the client to verify the server's identity.
+-   Server provides a digital certificate with its public key.
+-   Certificate issued by a trusted Certificate Authority (CA). The certificate actually contains the public key of the server.
+-   Allows the client to verify the server's identity.
 
 Modern cryptographic algorithms like AES are used for symmetric encryption in HTTPS, not XOR. - Asymmetric encryption is used mainly for key exchange, not for encrypting the actual data due to its speed overhead.
 
@@ -417,16 +432,14 @@ Modern cryptographic algorithms like AES are used for symmetric encryption in HT
 
 TLS 1.2 relies on the RSA asymmetric encryption algorithm. Here's the handshake process in this version:
 
-
 This uses RSA which is a popular asymmetric encrytion algorithm.
 
 1. The client send a hello.
-2. The server  sends its public key which is the certificte.
+2. The server sends its public key which is the certificte.
 3. Theclient send the symmetric key, encrypted with the the servers public key
 4. The server decrypts with it's private key to get the symmetric key. Now both server and client have the symmetric key which they can use to encrypt and decrypt their communication.
 
 The TLS 1.2 handshake involves two round trips. However, a challenge with this approach is the absence of perfect [forward secrecy](https://en.wikipedia.org/wiki/Forward_secrecy). If a private key is compromised in the future, an attacker could potentially decrypt past sessions. This is why security certificates are periodically renewed.
-
 
 **Diffie-Hellman Key Exchange**
 Diffie-Hellman key exchange is used instead of RSA for achieving forward secrecy. This involves two private keys and one public key to generate a shared symmetric key.
@@ -434,10 +447,8 @@ Diffie-Hellman key exchange is used instead of RSA for achieving forward secrecy
 ![Diffie Hellman](files/networking-concepts/diffie-hellman-1.png)
 ![Diffie Hellman](files/networking-concepts/diffie-hellman-2.png)
 
-
 **TLS 1.3**
 ![TLS 1.3](files/networking-concepts/tls-1_3.png)
-
 
 In TLS 1.3, the process is enhanced. Here's the updated handshake process:
 
