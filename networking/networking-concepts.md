@@ -156,6 +156,7 @@ The Transmission Control Protocol differs in several key features compared to th
 -   **Retransmission of lost packets**: any cumulative stream not acknowledged is retransmitted
 -   **Error-free data transfer**: corrupted packets are treated as lost and are retransmitted
 -   **Flow control**:
+
     -   Flow control regulates the rate of data transmission to match the receiver's capacity.
     -   Individual segment acknowledgment can be inefficient.
     -   Acknowledging multiple segments at once enhances efficiency.
@@ -170,6 +171,7 @@ The Transmission Control Protocol differs in several key features compared to th
     -   Negotiated during the handshake, "Window Scaling" involves a scaling factor that extends the window size beyond the 64KB limit
 
 -   **Congestion control**:
+
     -   Congestion control manages the network's capacity.
     -   Middle boxes like routers have capacity limits.
     -   Goal: Prevent network congestion and its negative effects.
@@ -177,6 +179,7 @@ The Transmission Control Protocol differs in several key features compared to th
 
     -   Two Congestion Control Algorithms:
     -   TCP Slow Start:
+
         -   CWND starts with 1 MSS (or more)
         -   Send 1 Segment and waits for ACK
         -   With EACH ACK received CWND is incremented by 1 MSS
@@ -184,6 +187,7 @@ The Transmission Control Protocol differs in several key features compared to th
             ![Slow Start](files/networking-concepts/tcp-slow-start.png)
 
     -   Congestion Avoidance:
+
         -   Activates once Slow Start reaches its threshold.
         -   Send CWND worth of Segments and waits for ACK
         -   Only when ALL segments are ACKed add UP to one MSS to CWND
@@ -389,7 +393,7 @@ MTU is a network interface property; each host can have a different value. You r
 
 ### Nagle's Algorithm and Delayed Acknowledgement
 
-In the telnet days, most keypresses generated a single byte of data that is transmitted immediately. Since TCP packets have a 40-byte header (20 bytes for TCP, 20 bytes for IPv4), this results in a 41-byte packet for 1 byte of useful information, a huge overhead. To solve this waste **Nagle's Algorithm** combines small segments and send them as one. The client can wait for a full MSS before sending the segment.
+In the telnet days, most key-presses generated a single byte of data that is transmitted immediately. Since TCP packets have a 40-byte header (20 bytes for TCP, 20 bytes for IPv4), this results in a 41-byte packet for 1 byte of useful information, a huge overhead. To solve this waste **Nagle's Algorithm** combines small segments and send them as one. The client can wait for a full MSS before sending the segment.
 
 ```
 Nagles Algortihm
@@ -414,7 +418,7 @@ The wait can be perceived as a delay in the client side. The problem with Nagle'
 
 Modern clients commonly disable Nagle's algorithm, favoring performance over minimal bandwidth conservation. This is achieved through options like `TCP_NODELAY`. For instance, Curl disabled Nagle's algorithm by default in 2016 due to its negative impact on the TLS handshake process. More details can be found in this [commit](https://github.com/curl/curl/commit/4732ca5724072f132876f520c8f02c7c5b654d9).
 
-**Dealyed Acknowledgement**
+**Delayed Acknowledgement**
 
 It may be a waste to acknowledge segments right away, sending an ack for each segment. We can wait little more to receive more segment and ack once
 
@@ -428,13 +432,13 @@ Delayed ack algorithm can be disabled with `TCP_QUICKACK` option, this way segme
 
 ### Domain Name System (DNS)
 
-IP addresses are essential for transmitting IP packets, forming the foundation of network communications, while DNS serves the purpose of converting hostnames (text) into IP addresses (numbers). Hostnames can remain unchanged even if IP addresses change, and a single service can have multiple IP addresses. DNS facilitates the selection of the most suitable IP address(es) based on factors like geographic proximity and lower server loads, ensuring optimal performance. DNS is built on top of UDP.
+IP addresses are essential for transmitting IP packets, forming the foundation of network communications, while DNS serves the purpose of converting hostname (text) into IP addresses (numbers). Hostname can remain unchanged even if IP addresses change, and a single service can have multiple IP addresses. DNS facilitates the selection of the most suitable IP address(es) based on factors like geographic proximity and lower server loads, ensuring optimal performance. DNS is built on top of UDP.
 
 Beyond IP addresses, DNS contains various types of information:
 
--   A Record (Address Record): Associates hostnames with IPv4 addresses.
--   AAAA Record: Links hostnames to IPv6 addresses.
--   CNAME Record (Canonical Name Record): Establishes aliases for hostnames, often utilized for subdomains.
+-   A Record (Address Record): Associates hostname with IPv4 addresses.
+-   AAAA Record: Links hostname to IPv6 addresses.
+-   CNAME Record (Canonical Name Record): Establishes aliases for hostname, often utilized for subdomains.
 -   MX Record (Mail Exchanger Record): Specifies mail servers for receiving domain email.
 -   NS Record (Name Server Record): Identifies authoritative name servers for a domain.
 -   TXT Record (Text Record): Stores diverse text-based data for different uses.
@@ -522,11 +526,11 @@ Modern cryptographic algorithms like AES are used for symmetric encryption in HT
 
 TLS 1.2 relies on the RSA asymmetric encryption algorithm. Here's the handshake process in this version:
 
-This uses RSA which is a popular asymmetric encrytion algorithm.
+This uses RSA which is a popular asymmetric encryption algorithm.
 
 1. The client send a hello.
-2. The server sends its public key which is the certificte.
-3. Theclient send the symmetric key, encrypted with the the servers public key
+2. The server sends its public key which is the certificate.
+3. The client send the symmetric key, encrypted with the the servers public key
 4. The server decrypts with it's private key to get the symmetric key. Now both server and client have the symmetric key which they can use to encrypt and decrypt their communication.
 
 The TLS 1.2 handshake involves two round trips. However, a challenge with this approach is the absence of perfect [forward secrecy](https://en.wikipedia.org/wiki/Forward_secrecy). If a private key is compromised in the future, an attacker could potentially decrypt past sessions. This is why security certificates are periodically renewed.
@@ -550,4 +554,63 @@ TLS 1.3 introduces several improvements, including the potential for a one-round
 
 ## The cost of connections
 
-Connection Establishment is costly.
+### Connection Establishment is costly.
+
+-   In TCP, the three way handshake `(SYN, SYN-ACK, ACK)` introduces latency.
+-   The further apart the peers, the slower it is to send segments
+-   Slow start keeps the connection from reaching its potential right away
+-   Congestion control and flow control limit that further
+-   Delayed Ack and Nagle's algorithm can further slow down
+-   Destroying the connection is also expensive
+
+### Solutions
+
+#### Connection Pooling
+
+-   Most implementation in database backends and reverse proxies use pooling
+-   Establish a bunch of TCP connection to the backend and keep them running!
+-   Any request that comes to the backend use an already opened connection
+-   This way your connections will be “warm” and slow start would have already kicked in. We want a large, fat CWND.
+-   Don’t close the connection unless you absolutely don’t need it
+
+#### Eager vs Lazy Loading
+
+-   Depending on what paradigm you take you can save on resources
+-   Eager loading -> Load everything and keep it ready
+    -   Start up is slow but requests will be served immediately
+    -   Some apps send warm up data to kick in the slow start but be careful of bandwidth and
+        scalability
+-   Lazy Loading -> only load things on demand
+    -   Start up is fast but requests will suffer initially
+
+#### TCP Fast Open
+
+-   TCP Handshake is traditionally slow due to back-and-forth communication.
+-   If a client has connected to a server before, can we use a predetermined token to allow sending data immediately during the handshake? This is quite usual in web apps, like when a user communicates with a server using a web browser and HTTP. This method is called TCP Fast Open (TFO).
+-   Process:
+    -   During initial connection, server sends encrypted cookie.
+    -   Client stores TFO cookie.
+    -   For subsequent connection, client sends SYN, data, and TFO cookie in TCP options.
+    -   Server authenticates cookie, responds with SYN/ACK + response.
+    ![TCP Fast Open](files/networking-concepts/tcp-fast-open.png)
+-   We can still get TCP Slow start with TCP Fast open. We can take advantage of this feature to send early data
+-   Default in Linux 3.13 and newer.
+-   Enable TFO with --tcp-fastopen option in curl.
+
+## The Listening Server (Understanding what to listen on)
+
+- You create a server by listening on a port on a specific ip address
+- Your machine might have multiple interfaces with multiple IP address
+    - listen(127.0.0.1, 8080) -> listens on the local host ipv4 interface on port 8080
+    - listen(::1, 8080) -> listens on localhost ipv6 interface on port 8080
+    - listen(192.168.1.2, 8080) -> listens on 192.168.1.2 on port 8080
+    - listen(0.0.0.0, 8080) -> listens on all ipv4 interfaces on port 8080 (can be dangerous)
+    - listen(::, 8080) -> listens on all ipv6 interfaces on port 8080 (can be dangerous)
+- You can only have one process in a host listening on an IP/Port pair
+- No two processes can listen on the same port
+- P1->Listen(127.0.0.1,8080)
+- P2->Listen(127.0.0.1,8080) error
+- However, there is an exception. `SO_PORTREUSE` is a socket property that allows more than one process to listen on the same port.
+- Operating systems balance load balance the connections among processes
+- OS creates a hash source ip/source port/dest ip/ dest port
+- Guarantees always go to the same process if the pair match
