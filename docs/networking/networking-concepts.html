@@ -386,13 +386,13 @@ address.</li>
 <p>The Transmission Control Protocol differs in several key features
 compared to the User Datagram Protocol:</p>
 <ul>
-<li><strong>Ordered data transfer</strong>: the destination host
-rearranges segments according to a sequence number</li>
-<li><strong>Retransmission of lost packets</strong>: any cumulative
-stream not acknowledged is retransmitted</li>
-<li><strong>Error-free data transfer</strong>: corrupted packets are
-treated as lost and are retransmitted</li>
-<li><strong>Flow control</strong>:
+<li><p><strong>Ordered data transfer</strong>: the destination host
+rearranges segments according to a sequence number</p></li>
+<li><p><strong>Retransmission of lost packets</strong>: any cumulative
+stream not acknowledged is retransmitted</p></li>
+<li><p><strong>Error-free data transfer</strong>: corrupted packets are
+treated as lost and are retransmitted</p></li>
+<li><p><strong>Flow control</strong>:</p>
 <ul>
 <li>Flow control regulates the rate of data transmission to match the
 receiver’s capacity.</li>
@@ -416,7 +416,7 @@ window size, especially for larger data transfers.</li>
 <li>Negotiated during the handshake, “Window Scaling” involves a scaling
 factor that extends the window size beyond the 64KB limit</li>
 </ul></li>
-<li><strong>Congestion control</strong>:
+<li><p><strong>Congestion control</strong>:</p>
 <ul>
 <li><p>Congestion control manages the network’s capacity.</p></li>
 <li><p>Middle boxes like routers have capacity limits.</p></li>
@@ -799,7 +799,7 @@ alt="Path MTU Discovery" />
 </figure>
 <h3 id="nagles-algorithm-and-delayed-acknowledgement">Nagle’s Algorithm
 and Delayed Acknowledgement</h3>
-<p>In the telnet days, most keypresses generated a single byte of data
+<p>In the telnet days, most key-presses generated a single byte of data
 that is transmitted immediately. Since TCP packets have a 40-byte header
 (20 bytes for TCP, 20 bytes for IPv4), this results in a 41-byte packet
 for 1 byte of useful information, a huge overhead. To solve this waste
@@ -838,7 +838,7 @@ through options like <code>TCP_NODELAY</code>. For instance, Curl
 disabled Nagle’s algorithm by default in 2016 due to its negative impact
 on the TLS handshake process. More details can be found in this <a
 href="https://github.com/curl/curl/commit/4732ca5724072f132876f520c8f02c7c5b654d9">commit</a>.</p>
-<p><strong>Dealyed Acknowledgement</strong></p>
+<p><strong>Delayed Acknowledgement</strong></p>
 <p>It may be a waste to acknowledge segments right away, sending an ack
 for each segment. We can wait little more to receive more segment and
 ack once</p>
@@ -853,7 +853,7 @@ option, this way segments will be acknowledged ‘quicker’.</p>
 <h3 id="domain-name-system-dns">Domain Name System (DNS)</h3>
 <p>IP addresses are essential for transmitting IP packets, forming the
 foundation of network communications, while DNS serves the purpose of
-converting hostnames (text) into IP addresses (numbers). Hostnames can
+converting hostname (text) into IP addresses (numbers). Hostname can
 remain unchanged even if IP addresses change, and a single service can
 have multiple IP addresses. DNS facilitates the selection of the most
 suitable IP address(es) based on factors like geographic proximity and
@@ -861,11 +861,11 @@ lower server loads, ensuring optimal performance. DNS is built on top of
 UDP.</p>
 <p>Beyond IP addresses, DNS contains various types of information:</p>
 <ul>
-<li>A Record (Address Record): Associates hostnames with IPv4
+<li>A Record (Address Record): Associates hostname with IPv4
 addresses.</li>
-<li>AAAA Record: Links hostnames to IPv6 addresses.</li>
+<li>AAAA Record: Links hostname to IPv6 addresses.</li>
 <li>CNAME Record (Canonical Name Record): Establishes aliases for
-hostnames, often utilized for subdomains.</li>
+hostname, often utilized for subdomains.</li>
 <li>MX Record (Mail Exchanger Record): Specifies mail servers for
 receiving domain email.</li>
 <li>NS Record (Name Server Record): Identifies authoritative name
@@ -987,11 +987,11 @@ overhead.</p>
 </figure>
 <p>TLS 1.2 relies on the RSA asymmetric encryption algorithm. Here’s the
 handshake process in this version:</p>
-<p>This uses RSA which is a popular asymmetric encrytion algorithm.</p>
+<p>This uses RSA which is a popular asymmetric encryption algorithm.</p>
 <ol type="1">
 <li>The client send a hello.</li>
-<li>The server sends its public key which is the certificte.</li>
-<li>Theclient send the symmetric key, encrypted with the the servers
+<li>The server sends its public key which is the certificate.</li>
+<li>The client send the symmetric key, encrypted with the the servers
 public key</li>
 <li>The server decrypts with it’s private key to get the symmetric key.
 Now both server and client have the symmetric key which they can use to
@@ -1030,6 +1030,99 @@ communication between the client and the server.</li>
 a one-round-trip or even a zero-round-trip handshake, enhancing
 efficiency while maintaining strong security.</p>
 <h2 id="the-cost-of-connections">The cost of connections</h2>
-<p>Connection Establishment is costly.</p>
+<h3 id="connection-establishment-is-costly.">Connection Establishment is
+costly.</h3>
+<ul>
+<li>In TCP, the three way handshake <code>(SYN, SYN-ACK, ACK)</code>
+introduces latency.</li>
+<li>The further apart the peers, the slower it is to send segments</li>
+<li>Slow start keeps the connection from reaching its potential right
+away</li>
+<li>Congestion control and flow control limit that further</li>
+<li>Delayed Ack and Nagle’s algorithm can further slow down</li>
+<li>Destroying the connection is also expensive</li>
+</ul>
+<h3 id="solutions">Solutions</h3>
+<h4 id="connection-pooling">Connection Pooling</h4>
+<ul>
+<li>Most implementation in database backends and reverse proxies use
+pooling</li>
+<li>Establish a bunch of TCP connection to the backend and keep them
+running!</li>
+<li>Any request that comes to the backend use an already opened
+connection</li>
+<li>This way your connections will be “warm” and slow start would have
+already kicked in. We want a large, fat CWND.</li>
+<li>Don’t close the connection unless you absolutely don’t need it</li>
+</ul>
+<h4 id="eager-vs-lazy-loading">Eager vs Lazy Loading</h4>
+<ul>
+<li>Depending on what paradigm you take you can save on resources</li>
+<li>Eager loading -&gt; Load everything and keep it ready
+<ul>
+<li>Start up is slow but requests will be served immediately</li>
+<li>Some apps send warm up data to kick in the slow start but be careful
+of bandwidth and scalability</li>
+</ul></li>
+<li>Lazy Loading -&gt; only load things on demand
+<ul>
+<li>Start up is fast but requests will suffer initially</li>
+</ul></li>
+</ul>
+<h4 id="tcp-fast-open">TCP Fast Open</h4>
+<ul>
+<li>TCP Handshake is traditionally slow due to back-and-forth
+communication.</li>
+<li>If a client has connected to a server before, can we use a
+predetermined token to allow sending data immediately during the
+handshake? This is quite usual in web apps, like when a user
+communicates with a server using a web browser and HTTP. This method is
+called TCP Fast Open (TFO).</li>
+<li>Process:
+<ul>
+<li>During initial connection, server sends encrypted cookie.</li>
+<li>Client stores TFO cookie.</li>
+<li>For subsequent connection, client sends SYN, data, and TFO cookie in
+TCP options.</li>
+<li>Server authenticates cookie, responds with SYN/ACK + response. <img
+src="files/networking-concepts/tcp-fast-open.png"
+alt="TCP Fast Open" /></li>
+</ul></li>
+<li>We can still get TCP Slow start with TCP Fast open. We can take
+advantage of this feature to send early data</li>
+<li>Default in Linux 3.13 and newer.</li>
+<li>Enable TFO with –tcp-fastopen option in curl.</li>
+</ul>
+<h2 id="the-listening-server-understanding-what-to-listen-on">The
+Listening Server (Understanding what to listen on)</h2>
+<ul>
+<li>You create a server by listening on a port on a specific ip
+address</li>
+<li>Your machine might have multiple interfaces with multiple IP address
+<ul>
+<li>listen(127.0.0.1, 8080) -&gt; listens on the local host ipv4
+interface on port 8080</li>
+<li>listen(::1, 8080) -&gt; listens on localhost ipv6 interface on port
+8080</li>
+<li>listen(192.168.1.2, 8080) -&gt; listens on 192.168.1.2 on port
+8080</li>
+<li>listen(0.0.0.0, 8080) -&gt; listens on all ipv4 interfaces on port
+8080 (can be dangerous)</li>
+<li>listen(::, 8080) -&gt; listens on all ipv6 interfaces on port 8080
+(can be dangerous)</li>
+</ul></li>
+<li>You can only have one process in a host listening on an IP/Port
+pair</li>
+<li>No two processes can listen on the same port</li>
+<li>P1-&gt;Listen(127.0.0.1,8080)</li>
+<li>P2-&gt;Listen(127.0.0.1,8080) error</li>
+<li>However, there is an exception. <code>SO_PORTREUSE</code> is a
+socket property that allows more than one process to listen on the same
+port.</li>
+<li>Operating systems balance load balance the connections among
+processes</li>
+<li>OS creates a hash source ip/source port/dest ip/ dest port</li>
+<li>Guarantees always go to the same process if the pair match</li>
+</ul>
 </body>
 </html>
