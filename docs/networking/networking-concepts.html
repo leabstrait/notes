@@ -392,17 +392,86 @@ rearranges segments according to a sequence number</li>
 stream not acknowledged is retransmitted</li>
 <li><strong>Error-free data transfer</strong>: corrupted packets are
 treated as lost and are retransmitted</li>
-<li><strong>Flow control</strong>: limits the rate a sender transfers
-data to guarantee reliable delivery. The receiver continually hints the
-sender on how much data can be received (receiver sends an
-<strong>ACK</strong> with its window size [max 64KB but can be scaled up
-with the window scaling factor (0-14), so that window size can go up to
-1GB]). When the receiving host’s buffer fills, the next acknowledgment
-suspends the transfer and allows the data in the buffer to be processed.
-Employs a <strong>window sliding mechanism</strong>.</li>
-<li><strong>Congestion control</strong>: the receiver might handle the
-load but the middle boxes (routers) might not. lost packets (presumed
-due to congestion) trigger a reduction in data delivery rate</li>
+<li><strong>Flow control</strong>:
+<ul>
+<li>Flow control regulates the rate of data transmission to match the
+receiver’s capacity.</li>
+<li>Individual segment acknowledgment can be inefficient.</li>
+<li>Acknowledging multiple segments at once enhances efficiency.</li>
+<li>Sender needs to determine how much data to send before awaiting
+acknowledgment.</li>
+<li>Receiver communicates its “Window Size” (Receiver Window).</li>
+<li>The “Window Size” is a 16-bit value, allowing up to 64KB of data,
+and is updated with each acknowledgment.</li>
+<li>Employing the “Sliding Window” mechanism eliminates the need to wait
+for acknowledgments after each segment.</li>
+<li>The sender dynamically adjusts its window based on the receiver’s
+available capacity.</li>
+<li>This “Sliding Window” approach ensures continuous data flow while
+considering the receiver’s limits. <img
+src="files/networking-concepts/tcp-window-sliding.png"
+alt="Window Sliding" /></li>
+<li>“Window Scaling” is introduced to address limitations of the default
+window size, especially for larger data transfers.</li>
+<li>Negotiated during the handshake, “Window Scaling” involves a scaling
+factor that extends the window size beyond the 64KB limit</li>
+</ul></li>
+<li><strong>Congestion control</strong>:
+<ul>
+<li><p>Congestion control manages the network’s capacity.</p></li>
+<li><p>Middle boxes like routers have capacity limits.</p></li>
+<li><p>Goal: Prevent network congestion and its negative
+effects.</p></li>
+<li><p>Introduces “Congestion Window” (CWND) on the receivers
+side.</p></li>
+<li><p>Two Congestion Control Algorithms:</p></li>
+<li><p>TCP Slow Start:</p>
+<ul>
+<li>CWND starts with 1 MSS (or more)</li>
+<li>Send 1 Segment and waits for ACK</li>
+<li>With EACH ACK received CWND is incremented by 1 MSS</li>
+<li>Until we reach slow start threshold (ssthresh) we switch to
+congestion avoidance algorithm <img
+src="files/networking-concepts/tcp-slow-start.png"
+alt="Slow Start" /></li>
+</ul></li>
+<li><p>Congestion Avoidance:</p>
+<ul>
+<li>Activates once Slow Start reaches its threshold.</li>
+<li>Send CWND worth of Segments and waits for ACK</li>
+<li>Only when ALL segments are ACKed add UP to one MSS to CWND</li>
+<li>Precisely CWND = CWND + MSS*MSS/CWND</li>
+<li>“Sliding Window” mechanism helps manage congestion efficiently. CWND
+must not exceed Receiver Window (RWND). <img
+src="files/networking-concepts/tcp-congestion-avoidance.png"
+alt="Congestion Avoidance" /></li>
+<li>If timeouts, duplicate ACKs, or packet drops occur, congestion is
+detected.</li>
+<li>The moment we get timeouts, dup ACKs or packet drops</li>
+<li>The slow start threshold reduced to the half of whatever
+unacknowledged data is sent (roughly CWND/2 if all CWND worth of data is
+unacknowledged)</li>
+<li>The CWND is reset to 1 and we start over.</li>
+<li>Min slow start threshold is 2*MSS <img
+src="files/networking-concepts/tcp-congestion-detection.png"
+alt="Congestion Detection" /></li>
+</ul>
+<figure>
+<img
+src="files/networking-concepts/tcp-slow-start-vs-congestion-detection.png"
+alt="Slow Start vs Congestion Avoidance" />
+<figcaption aria-hidden="true">Slow Start vs Congestion
+Avoidance</figcaption>
+</figure></li>
+<li><p>Explicit Congestion Notification (ECN):</p>
+<ul>
+<li>We don’t want routers dropping packets</li>
+<li>Can Routers let us know when congestion hit?</li>
+<li>Routers tag IP packets with ECN bit.</li>
+<li>Receivers copy this bit back to the sender.</li>
+<li>Routers signal congestion without dropping packets.</li>
+</ul></li>
+</ul></li>
 </ul>
 <p>Capturing TCP segments with <code>tcpdump</code>:</p>
 <ul>
@@ -960,5 +1029,7 @@ communication between the client and the server.</li>
 <p>TLS 1.3 introduces several improvements, including the potential for
 a one-round-trip or even a zero-round-trip handshake, enhancing
 efficiency while maintaining strong security.</p>
+<h2 id="the-cost-of-connections">The cost of connections</h2>
+<p>Connection Establishment is costly.</p>
 </body>
 </html>
