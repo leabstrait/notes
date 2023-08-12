@@ -1,9 +1,6 @@
 ---
 title: Layer 4 Vs Layer 7 Load Balancing
-subtitle:
 author: Labin Ojha
-keywords:
-bibliography:
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
 fontsize: 11.5pt
 mainfont: Arial, Palatino, Georgia, Times
