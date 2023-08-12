@@ -684,18 +684,32 @@ instantiate the <strong>fin</strong> for you. The client will be in the
 <h4 id="tcp-cons">TCP Cons</h4>
 <p>While TCP is a reliable protocol for connections it has some
 disadvantages.</p>
-<ul>
-<li><p><a
+<p><strong><a
 href="https://en.wikipedia.org/wiki/Head-of-line_blocking">Head of Line
-Blocking</a>: Head-of-line blocking in TCP occurs when a packet loss or
-delay in a network causes subsequent packets to be held up, hindering
-their delivery even if they’re ready to be sent.</p></li>
-<li><p><a
-href="https://www.youtube.com/watch?v=AAssk2N_oPk&amp;ab_channel=Computerphile">TCP
-Meltdown</a>: TCP Meltdown occurs when you stack one transmission
-protocol on top of another, like what happens when an OpenVPN TCP tunnel
-is transporting TCP traffic inside it.</p></li>
+Blocking</a></strong></p>
+<ul>
+<li>TCP orders packets in the order they are sent</li>
+<li>The segments are not acknowledged or delivered to the app until they
+are in order. But what if multiple clients are using the same
+connection</li>
+<li>HTTP requests may use the same connection to send multiple
+requests(HTTP 1.1 onwards , <code>connection keepalive</code>)</li>
+<li>Request 1 is segments 1,2</li>
+<li>Request 2 is segments 3,4</li>
+<li>Segments 2,3,4 arrive but 1 is lost(probably took a different path
+through the router to arrive later or got congested and was
+dropped)?</li>
+<li>Request 2 technically was delivered but TCP is blocking it <img
+src="files/networking-concepts/tcp-hol.png" alt="TCP HOL" /></li>
+<li>Huge latency in apps, big problem in HTTP/2 with streams</li>
+<li>QUIC solves this</li>
 </ul>
+<p><strong><a
+href="https://www.youtube.com/watch?v=AAssk2N_oPk&amp;ab_channel=Computerphile">TCP
+Meltdown</a></strong></p>
+<p>TCP Meltdown occurs when you stack one transmission protocol on top
+of another, like what happens when an OpenVPN TCP tunnel is transporting
+TCP traffic inside it.</p>
 <h3 id="nat-network-address-translation">NAT (Network Address
 Translation)</h3>
 <p>IPV4 has a limit of 4 billion addresses which is not enough
@@ -713,12 +727,13 @@ table’ lives in the router has mappings to/from public and private
 ip-port pairs.</p>
 <p>Applications:</p>
 <ul>
-<li>Private to Public translations: So we don’t run out IPv4</li>
-<li>Port forwarding: Add a NAT entry in the router to forward packets to
-80 to a machine (any port, maybe 8080) in your LAN. No need to have root
-access to listen on port 80 on your device. Expose your local web server
-publicly</li>
-<li>Layer 4 Load Balancing: <a
+<li><strong>Private to Public translations:</strong> So we don’t run out
+IPv4</li>
+<li><strong>Port forwarding:</strong> Add a NAT entry in the router to
+forward packets to 80 to a machine (any port, maybe 8080) in your LAN.
+No need to have root access to listen on port 80 on your device. Expose
+your local web server publicly</li>
+<li><strong>Layer 4 Load Balancing:</strong> <a
 href="https://www.haproxy.com/blog/layer-4-load-balancing-nat-mode">HAProxy
 NAT Mode</a> - Your load balancer is your gateway. The gateway has an
 entry from a bogus IP (e.g. 100.100.100.100) to multiple machines in the
@@ -1122,7 +1137,7 @@ port.</li>
 <li>Operating systems balance load balance the connections among
 processes</li>
 <li>OS creates a hash source ip/source port/dest ip/ dest port</li>
-<li>Guarantees always go to the same process if the pair match</li>
+<li>Guarantees always go to the same process if the pair match `</li>
 </ul>
 </body>
 </html>
