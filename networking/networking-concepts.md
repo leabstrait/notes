@@ -342,9 +342,23 @@ _Note [Optimization]_ Whoever requests the **fin** will end up in the **TIME_WAI
 
 While TCP is a reliable protocol for connections it has some disadvantages.
 
--   [Head of Line Blocking](https://en.wikipedia.org/wiki/Head-of-line_blocking): Head-of-line blocking in TCP occurs when a packet loss or delay in a network causes subsequent packets to be held up, hindering their delivery even if they're ready to be sent.
+**[Head of Line Blocking](https://en.wikipedia.org/wiki/Head-of-line_blocking)**
 
--   [TCP Meltdown](https://www.youtube.com/watch?v=AAssk2N_oPk&ab_channel=Computerphile): TCP Meltdown occurs when you stack one transmission protocol on top of another, like what happens when an OpenVPN TCP tunnel is transporting TCP traffic inside it.
+-   TCP orders packets in the order they are sent
+-   The segments are not acknowledged or delivered to the app until they are in
+    order. But what if multiple clients are using the same connection
+-   HTTP requests may use the same connection to send multiple requests(HTTP 1.1 onwards , `connection keepalive`)
+-   Request 1 is segments 1,2
+-   Request 2 is segments 3,4
+-   Segments 2,3,4 arrive but 1 is lost(probably took a different path through the router to arrive later or got congested and was dropped)?
+-   Request 2 technically was delivered but TCP is blocking it
+    ![TCP HOL](files/networking-concepts/tcp-hol.png)
+-   Huge latency in apps, big problem in HTTP/2 with streams
+-   QUIC solves this
+
+**[TCP Meltdown](https://www.youtube.com/watch?v=AAssk2N_oPk&ab_channel=Computerphile)**
+
+TCP Meltdown occurs when you stack one transmission protocol on top of another, like what happens when an OpenVPN TCP tunnel is transporting TCP traffic inside it.
 
 ### NAT (Network Address Translation)
 
@@ -356,9 +370,9 @@ All devices have the same public IP address which is the router. The source port
 
 Applications:
 
--   Private to Public translations: So we don't run out IPv4
--   Port forwarding: Add a NAT entry in the router to forward packets to 80 to a machine (any port, maybe 8080) in your LAN. No need to have root access to listen on port 80 on your device. Expose your local web server publicly
--   Layer 4 Load Balancing: [HAProxy NAT Mode](https://www.haproxy.com/blog/layer-4-load-balancing-nat-mode) - Your load balancer is your gateway. The gateway has an entry from a bogus IP (e.g. 100.100.100.100) to multiple machines in the internal network. Clients send a request to the bogus service IP. The router intercepts that packet and replaces the service IP with a destination server. Layer 4 reverse proxying
+-   **Private to Public translations:** So we don't run out IPv4
+-   **Port forwarding:** Add a NAT entry in the router to forward packets to 80 to a machine (any port, maybe 8080) in your LAN. No need to have root access to listen on port 80 on your device. Expose your local web server publicly
+-   **Layer 4 Load Balancing:** [HAProxy NAT Mode](https://www.haproxy.com/blog/layer-4-load-balancing-nat-mode) - Your load balancer is your gateway. The gateway has an entry from a bogus IP (e.g. 100.100.100.100) to multiple machines in the internal network. Clients send a request to the bogus service IP. The router intercepts that packet and replaces the service IP with a destination server. Layer 4 reverse proxying
 
 ### Maximum Segment Size (MSS) and Maximum Transmission Unit (MTU)
 
@@ -592,25 +606,26 @@ TLS 1.3 introduces several improvements, including the potential for a one-round
     -   Client stores TFO cookie.
     -   For subsequent connection, client sends SYN, data, and TFO cookie in TCP options.
     -   Server authenticates cookie, responds with SYN/ACK + response.
-    ![TCP Fast Open](files/networking-concepts/tcp-fast-open.png)
+        ![TCP Fast Open](files/networking-concepts/tcp-fast-open.png)
 -   We can still get TCP Slow start with TCP Fast open. We can take advantage of this feature to send early data
 -   Default in Linux 3.13 and newer.
 -   Enable TFO with --tcp-fastopen option in curl.
 
 ## The Listening Server (Understanding what to listen on)
 
-- You create a server by listening on a port on a specific ip address
-- Your machine might have multiple interfaces with multiple IP address
-    - listen(127.0.0.1, 8080) -> listens on the local host ipv4 interface on port 8080
-    - listen(::1, 8080) -> listens on localhost ipv6 interface on port 8080
-    - listen(192.168.1.2, 8080) -> listens on 192.168.1.2 on port 8080
-    - listen(0.0.0.0, 8080) -> listens on all ipv4 interfaces on port 8080 (can be dangerous)
-    - listen(::, 8080) -> listens on all ipv6 interfaces on port 8080 (can be dangerous)
-- You can only have one process in a host listening on an IP/Port pair
-- No two processes can listen on the same port
-- P1->Listen(127.0.0.1,8080)
-- P2->Listen(127.0.0.1,8080) error
-- However, there is an exception. `SO_PORTREUSE` is a socket property that allows more than one process to listen on the same port.
-- Operating systems balance load balance the connections among processes
-- OS creates a hash source ip/source port/dest ip/ dest port
-- Guarantees always go to the same process if the pair match
+-   You create a server by listening on a port on a specific ip address
+-   Your machine might have multiple interfaces with multiple IP address
+    -   listen(127.0.0.1, 8080) -> listens on the local host ipv4 interface on port 8080
+    -   listen(::1, 8080) -> listens on localhost ipv6 interface on port 8080
+    -   listen(192.168.1.2, 8080) -> listens on 192.168.1.2 on port 8080
+    -   listen(0.0.0.0, 8080) -> listens on all ipv4 interfaces on port 8080 (can be dangerous)
+    -   listen(::, 8080) -> listens on all ipv6 interfaces on port 8080 (can be dangerous)
+-   You can only have one process in a host listening on an IP/Port pair
+-   No two processes can listen on the same port
+-   P1->Listen(127.0.0.1,8080)
+-   P2->Listen(127.0.0.1,8080) error
+-   However, there is an exception. `SO_PORTREUSE` is a socket property that allows more than one process to listen on the same port.
+-   Operating systems balance load balance the connections among processes
+-   OS creates a hash source ip/source port/dest ip/ dest port
+-   Guarantees always go to the same process if the pair match
+    `
