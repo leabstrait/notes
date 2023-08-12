@@ -53,6 +53,9 @@ def create_index_html(directory):
             if entry.name == "gen-readme-recursive.py":
                 continue
 
+            if entry.name == "notes.sh":
+                continue
+
             if entry.name == "references.bib":
                 continue
 
