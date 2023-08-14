@@ -1108,36 +1108,5 @@ advantage of this feature to send early data</li>
 <li>Default in Linux 3.13 and newer.</li>
 <li>Enable TFO with –tcp-fastopen option in curl.</li>
 </ul>
-<h2 id="the-listening-server-understanding-what-to-listen-on">The
-Listening Server (Understanding what to listen on)</h2>
-<ul>
-<li>You create a server by listening on a port on a specific ip
-address</li>
-<li>Your machine might have multiple interfaces with multiple IP address
-<ul>
-<li>listen(127.0.0.1, 8080) -&gt; listens on the local host ipv4
-interface on port 8080</li>
-<li>listen(::1, 8080) -&gt; listens on localhost ipv6 interface on port
-8080</li>
-<li>listen(192.168.1.2, 8080) -&gt; listens on 192.168.1.2 on port
-8080</li>
-<li>listen(0.0.0.0, 8080) -&gt; listens on all ipv4 interfaces on port
-8080 (can be dangerous)</li>
-<li>listen(::, 8080) -&gt; listens on all ipv6 interfaces on port 8080
-(can be dangerous)</li>
-</ul></li>
-<li>You can only have one process in a host listening on an IP/Port
-pair</li>
-<li>No two processes can listen on the same port</li>
-<li>P1-&gt;Listen(127.0.0.1,8080)</li>
-<li>P2-&gt;Listen(127.0.0.1,8080) error</li>
-<li>However, there is an exception. <code>SO_PORTREUSE</code> is a
-socket property that allows more than one process to listen on the same
-port.</li>
-<li>Operating systems balance load balance the connections among
-processes</li>
-<li>OS creates a hash source ip/source port/dest ip/ dest port</li>
-<li>Guarantees always go to the same process if the pair match `</li>
-</ul>
 </body>
 </html>
