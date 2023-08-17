@@ -235,34 +235,16 @@
 <header id="title-block-header">
 <h1 class="title">Docker Networking and Advanced Routing</h1>
 </header>
-<p>NEEDS TESTING</p>
-<p>In Docker, default containers join the ‘bridge’ network, but for more
-control and security, custom networks are preferable. The ‘bridge’
-network has limitations for production, making tailored networks
-necessary.</p>
-<p>Creating custom networks:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network create backend <span class="at">--subnet</span> 10.0.0.0/24</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network create frontend <span class="at">--subnet</span> 10.0.1.0/24</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network create loadbalancer <span class="at">--subnet</span> 10.0.2.0/24</span></code></pre></div>
-<p>Adding the <code>--internal</code> flag ensures internal-only
-networks.</p>
-<p>Inspecting networks:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network inspect backend</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network inspect frontend</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network inspect loadbalancer</span></code></pre></div>
-<p>To connect a container to a network:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect backend s1</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect frontend s2</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect loadbalancer lb1</span></code></pre></div>
-<p>For detaching from the default ‘bridge’ network:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network disconnect bridge s1</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network disconnect bridge s2</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network disconnect bridge lb1</span></code></pre></div>
-<p>Benefits of using isolated networks:</p>
+<h2
+id="introduction-to-docker-networking-and-custom-networks">Introduction
+to Docker Networking and Custom Networks</h2>
+<p>In Docker, containers by default join the ‘bridge’ network, but for
+better control and security, it’s recommended to create custom networks.
+This guide explores the creation, management, and benefits of custom
+networks in Docker.</p>
+<h2 id="benefits-of-isolated-networks">Benefits of Isolated
+Networks</h2>
+<p>Using isolated networks in Docker offers several advantages:</p>
 <ul>
 <li><strong>Isolation and Security</strong>: Enhances security by
 containing breaches and unauthorized access.</li>
@@ -277,43 +259,129 @@ aids in troubleshooting and configuration.</li>
 <li><strong>Resource Optimization</strong>: Optimizes performance by
 preventing resource clashes.</li>
 </ul>
-<p>To achieve advanced routing and allow communication between isolated
-networks, you can add custom routes within a container:</p>
-<p>docker run -d –name gateway –network backend –network frontend
-your_gateway_image</p>
-<p>gateway can be connected to teh intenet and other networks connected
-to it, so hat we can do logging and centralize conenctio nfrom here.</p>
+<h2 id="creating-custom-networks">Creating Custom Networks</h2>
+<p>To create custom networks in Docker:</p>
+<ol type="1">
+<li><p><strong>Create Custom Networks:</strong></p>
+<p>Open a terminal and execute the following commands to create custom
+networks with specific IP address ranges:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network create backend <span class="at">--subnet</span> 10.0.0.0/24</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network create frontend <span class="at">--subnet</span> 10.0.1.0/24</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network create loadbalancer <span class="at">--subnet</span> 10.0.2.0/24</span></code></pre></div>
+<p>This establishes three isolated networks: <code>backend</code>,
+<code>frontend</code>, and <code>loadbalancer</code>, each with its own
+IP address range.</p></li>
+<li><p><strong>Inspect Network Properties:</strong></p>
+<p>You can inspect the properties of the created networks to ensure
+their configuration meets your requirements. Run the following commands
+to see detailed information about each network:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network inspect backend</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network inspect frontend</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network inspect loadbalancer</span></code></pre></div>
+<p>This command provides insights into network settings such as IP
+ranges, connected containers, and more.</p></li>
+</ol>
+<h2 id="creating-containers">Creating Containers</h2>
+<p>Before connecting containers to networks or adding custom routes,
+create the necessary containers:</p>
+<ol type="1">
+<li><p><strong>Create the <code>nhttpd</code> Image:</strong></p>
+<p>Create a Dockerfile with the following content and save it in a
+directory:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> httpd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> install <span class="at">-y</span> iputils-ping</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> install <span class="at">-y</span> inetutils-traceroute</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> install <span class="at">-y</span> iproute2</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> install <span class="at">-y</span> curl telnet dnsutils vim</span></code></pre></div>
+<p>Build the image with the name <code>nhttpd</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> nhttpd /path/to/dockerfile_directory</span></code></pre></div></li>
+<li><p><strong>Create Containers with Network Administrative
+Capabilities:</strong></p>
+<p>Launch containers named <code>s1</code>, <code>s2</code>, and
+<code>lb1</code> using the <code>nhttpd</code> image and with network
+administrative capabilities:</p>
 <div class="sourceCode" id="cb5"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> route add 10.0.1.0/24 via 10.0.0.3</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> route add 10.0.2.0/24 via 10.0.0.4</span></code></pre></div>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> s1 <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN nhttpd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> s2 <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN nhttpd</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> lb1 <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN nhttpd</span></code></pre></div>
+<p>These containers are now equipped with the ability to perform
+advanced networking operations.</p></li>
+<li><p><strong>Create the Gateway Container:</strong></p>
+<p>Launch a container named <code>gateway</code> using the
+<code>nhttpd</code> image, with network administrative capabilities:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> gateway <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN nhttpd</span></code></pre></div>
+<p>This container will act as a central hub for connecting and routing
+traffic between networks.</p></li>
+</ol>
+<h2 id="connecting-containers-to-networks">Connecting Containers to
+Networks</h2>
+<p>Now that the containers are created, connect them to the appropriate
+custom networks:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect backend s1</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect frontend s2</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect loadbalancer lb1</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect backend gateway</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect frontend gateway</span></code></pre></div>
+<p>These commands establish connections between containers and networks,
+enabling isolated communication.</p>
+<h2
+id="advanced-routing-and-communication-between-isolated-networks">Advanced
+Routing and Communication Between Isolated Networks</h2>
+<p>For advanced routing and communication between isolated networks:</p>
+<ol type="1">
+<li><p><strong>Add Custom Routes to the Gateway Container:</strong></p>
+<p>Once you’ve set up your <code>gateway</code> container, you need to
+configure custom routes within this container to enable communication
+between the isolated networks.</p>
+<ul>
+<li><p><strong>Step 1:</strong> Access the <code>gateway</code>
+container’s command line by running:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> exec <span class="at">-it</span> gateway bash</span></code></pre></div></li>
+<li><p><strong>Step 2:</strong> Inside the container, use the
+<code>ip route add</code> command to add custom routes. These routes
+will instruct the container’s networking stack how to forward traffic
+between networks. For example, if you want to enable communication
+between the <code>frontend</code> network (10.0.1.0/24) and the
+<code>backend</code> network (10.0.0.0/24), run:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> route add 10.0.1.0/24 via 10.0.0.3</span></code></pre></div>
 <p>Here, <code>10.0.1.0/24</code> is the destination subnet (for the
 <code>frontend</code> network), and <code>10.0.0.3</code> is the IP
-address of the gateway within the <code>backend</code> network.
-Similarly, <code>10.0.2.0/24</code> is the destination subnet for the
-<code>loadbalancer</code> network, and <code>10.0.0.4</code> is the
-corresponding gateway IP.</p>
-<p>Additionally, you can enable network administrative capabilities
-using:</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> s1 <span class="at">--network</span> backend <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN your_image</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> s2 <span class="at">--network</span> frontend <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN your_image</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> lb1 <span class="at">--network</span> loadbalancer <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN your_image</span></code></pre></div>
+address of a container within the <code>backend</code> network that
+serves as a gateway. This route tells the <code>gateway</code> container
+how to forward traffic to the <code>frontend</code> network.</p></li>
+<li><p><strong>Step 3:</strong> Similarly, add a route for the
+<code>loadbalancer</code> network (if needed):</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> route add 10.0.2.0/24 via 10.0.0.4</span></code></pre></div>
+<p>Here, <code>10.0.2.0/24</code> is the destination subnet (for the
+<code>loadbalancer</code> network), and <code>10.0.0.4</code> is the IP
+address of a container within the <code>backend</code> network that
+serves as a gateway.</p></li>
+<li><p><strong>Step 4:</strong> Exit the container’s command line:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span></span></code></pre></div></li>
+</ul>
+<p>With these custom routes configured within the <code>gateway</code>
+container, it can now effectively route traffic between the isolated
+networks. This advanced routing enables seamless communication while
+maintaining the isolation and security of the networks.</p></li>
+</ol>
+<h2 id="centralized-networking-and-custom-setups">Centralized Networking
+and Custom Setups</h2>
 <p>The <code>gateway</code> container serves as a central point for
-connecting separate networks. It is given administrative privileges
-through the <code>--cap-add=NET_ADMIN</code> flag, enabling it to
-perform advanced routing tasks. By connecting the <code>gateway</code>
-container to different networks (<code>backend</code> and
-<code>frontend</code> in this example), you enable communication between
-isolated networks.</p>
-<p>This setup allows advanced routing and fine-grained control over
-container networking. If you need more networks, you can create them
-using similar commands. Docker’s flexibility in networking enables
-tailored setups to meet application requirements, ensuring security,
-performance, and communication needs are met.</p>
-<p>Remember to replace placeholders like <code>backend</code>,
-<code>frontend</code>, <code>loadbalancer</code>,
-<code>10.0.0.0/24</code>, <code>10.0.1.3</code>, <code>10.0.0.4</code>,
-<code>your_gateway_image</code>, and <code>your_image</code> with the
-appropriate values for your specific setup.</p>
+connecting separate networks, enabling communication through advanced
+routing. Docker’s flexibility in networking allows tailored setups to
+meet application requirements, ensuring security, performance, and
+communication needs are met.</p>
 </body>
 </html>
