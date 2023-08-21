@@ -27,6 +27,7 @@ notes() {
         local full_path="$2"
         local note_name=$(basename "$full_path")
         local note_dir=$(dirname "$full_path")
+        mkdir -p $note_dir
         local note_filename="$note_name.md"
         local title_case=$(echo "$note_name" | sed 's/\b\(.\)/\u\1/g' | sed 's/-/ /g')
         local note_path="$notes_dir/$note_dir/$note_filename"
