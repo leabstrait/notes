@@ -2,8 +2,6 @@
 title: Test Merge
 subtitle:
 author: Labin Ojha
-keywords:
-bibliography:
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
 fontsize: 11.5pt
 mainfont: Arial, Palatino, Georgia, Times
