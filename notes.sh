@@ -51,8 +51,7 @@ fontsize: 11.5pt
 mainfont: Arial, Palatino, Georgia, Times
 ---
 
-# $title_case
----
+
 EOF
 
         echo "Created new note: $title_case"
