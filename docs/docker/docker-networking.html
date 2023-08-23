@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Docker Networking and Advanced Routing</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Docker Networking and Advanced Routing</h1>
+</header>
+<h2
+id="introduction-to-docker-networking-and-custom-networks">Introduction
+to Docker Networking and Custom Networks</h2>
+<p>In Docker, containers by default join the ‘bridge’ network, but for
+better control and security, it’s recommended to create custom networks.
+This guide explores the creation, management, and benefits of custom
+networks in Docker.</p>
+<h2 id="benefits-of-isolated-networks">Benefits of Isolated
+Networks</h2>
+<p>Using isolated networks in Docker offers several advantages:</p>
+<ul>
+<li><strong>Isolation and Security</strong>: Enhances security by
+containing breaches and unauthorized access.</li>
+<li><strong>Controlled Communication</strong>: Regulates
+service-to-service communication, avoiding undesired interactions.</li>
+<li><strong>Microservices Architecture</strong>: Streamlines management
+and scalability in line with microservices.</li>
+<li><strong>Load Balancing</strong>: Centralizes load balancers in
+unique networks for simplified traffic management.</li>
+<li><strong>Operational Efficiency</strong>: Network-specific management
+aids in troubleshooting and configuration.</li>
+<li><strong>Resource Optimization</strong>: Optimizes performance by
+preventing resource clashes.</li>
+</ul>
+<h2 id="creating-custom-networks">Creating Custom Networks</h2>
+<p>To create custom networks in Docker:</p>
+<ol type="1">
+<li><p><strong>Create Custom Networks:</strong></p>
+<p>Open a terminal and execute the following commands to create custom
+networks with specific IP address ranges:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network create backend <span class="at">--subnet</span> 10.0.0.0/24</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network create frontend <span class="at">--subnet</span> 10.0.1.0/24</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network create loadbalancer <span class="at">--subnet</span> 10.0.2.0/24</span></code></pre></div>
+<p>This establishes three isolated networks: <code>backend</code>,
+<code>frontend</code>, and <code>loadbalancer</code>, each with its own
+IP address range.</p></li>
+<li><p><strong>Inspect Network Properties:</strong></p>
+<p>You can inspect the properties of the created networks to ensure
+their configuration meets your requirements. Run the following commands
+to see detailed information about each network:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network inspect backend</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network inspect frontend</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network inspect loadbalancer</span></code></pre></div>
+<p>This command provides insights into network settings such as IP
+ranges, connected containers, and more.</p></li>
+</ol>
+<h2 id="creating-containers">Creating Containers</h2>
+<p>Before connecting containers to networks or adding custom routes,
+create the necessary containers:</p>
+<ol type="1">
+<li><p><strong>Create the <code>nhttpd</code> Image:</strong></p>
+<p>Create a Dockerfile with the following content and save it in a
+directory:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> httpd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> install <span class="at">-y</span> iputils-ping</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> install <span class="at">-y</span> inetutils-traceroute</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> install <span class="at">-y</span> iproute2</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> install <span class="at">-y</span> curl telnet dnsutils vim</span></code></pre></div>
+<p>Build the image with the name <code>nhttpd</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> nhttpd /path/to/dockerfile_directory</span></code></pre></div></li>
+<li><p><strong>Create Containers with Network Administrative
+Capabilities:</strong></p>
+<p>Launch containers named <code>s1</code>, <code>s2</code>, and
+<code>lb1</code> using the <code>nhttpd</code> image and with network
+administrative capabilities:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> s1 <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN nhttpd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> s2 <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN nhttpd</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> lb1 <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN nhttpd</span></code></pre></div>
+<p>These containers are now equipped with the ability to perform
+advanced networking operations.</p></li>
+<li><p><strong>Create the Gateway Container:</strong></p>
+<p>Launch a container named <code>gateway</code> using the
+<code>nhttpd</code> image, with network administrative capabilities:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-d</span> <span class="at">--name</span> gateway <span class="at">--cap-add</span><span class="op">=</span>NET_ADMIN nhttpd</span></code></pre></div>
+<p>This container will act as a central hub for connecting and routing
+traffic between networks.</p></li>
+</ol>
+<h2 id="connecting-containers-to-networks">Connecting Containers to
+Networks</h2>
+<p>Now that the containers are created, connect them to the appropriate
+custom networks:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect backend s1</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect frontend s2</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect loadbalancer lb1</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect backend gateway</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> network connect frontend gateway</span></code></pre></div>
+<p>These commands establish connections between containers and networks,
+enabling isolated communication.</p>
+<h2
+id="advanced-routing-and-communication-between-isolated-networks">Advanced
+Routing and Communication Between Isolated Networks</h2>
+<p>For advanced routing and communication between isolated networks:</p>
+<ol type="1">
+<li><p><strong>Add Custom Routes to the Gateway Container:</strong></p>
+<p>Once you’ve set up your <code>gateway</code> container, you need to
+configure custom routes within this container to enable communication
+between the isolated networks.</p>
+<ul>
+<li><p><strong>Step 1:</strong> Access the <code>gateway</code>
+container’s command line by running:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> exec <span class="at">-it</span> gateway bash</span></code></pre></div></li>
+<li><p><strong>Step 2:</strong> Inside the container, use the
+<code>ip route add</code> command to add custom routes. These routes
+will instruct the container’s networking stack how to forward traffic
+between networks. For example, if you want to enable communication
+between the <code>frontend</code> network (10.0.1.0/24) and the
+<code>backend</code> network (10.0.0.0/24), run:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> route add 10.0.1.0/24 via 10.0.0.3</span></code></pre></div>
+<p>Here, <code>10.0.1.0/24</code> is the destination subnet (for the
+<code>frontend</code> network), and <code>10.0.0.3</code> is the IP
+address of a container within the <code>backend</code> network that
+serves as a gateway. This route tells the <code>gateway</code> container
+how to forward traffic to the <code>frontend</code> network.</p></li>
+<li><p><strong>Step 3:</strong> Similarly, add a route for the
+<code>loadbalancer</code> network (if needed):</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> route add 10.0.2.0/24 via 10.0.0.4</span></code></pre></div>
+<p>Here, <code>10.0.2.0/24</code> is the destination subnet (for the
+<code>loadbalancer</code> network), and <code>10.0.0.4</code> is the IP
+address of a container within the <code>backend</code> network that
+serves as a gateway.</p></li>
+<li><p><strong>Step 4:</strong> Exit the container’s command line:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span></span></code></pre></div></li>
+</ul>
+<p>With these custom routes configured within the <code>gateway</code>
+container, it can now effectively route traffic between the isolated
+networks. This advanced routing enables seamless communication while
+maintaining the isolation and security of the networks.</p></li>
+</ol>
+<h2 id="centralized-networking-and-custom-setups">Centralized Networking
+and Custom Setups</h2>
+<p>The <code>gateway</code> container serves as a central point for
+connecting separate networks, enabling communication through advanced
+routing. Docker’s flexibility in networking allows tailored setups to
+meet application requirements, ensuring security, performance, and
+communication needs are met.</p>
+</body>
+</html>
