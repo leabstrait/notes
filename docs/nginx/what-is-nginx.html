@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Labin Ojha" />
+  <title>What Is Nginx</title>
+  <style>
+    html {
+      font-family: Arial, Palatino, Georgia, Times;
+      font-size: 11.5pt;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">What Is Nginx</h1>
+<p class="author">Labin Ojha</p>
+</header>
+<h2 id="nginx-usecases">Nginx Usecases</h2>
+<ul>
+<li>Web Server
+<ul>
+<li>Serves web content</li>
+</ul></li>
+<li>Reverse Proxy
+<ul>
+<li>Load Balancing</li>
+<li>Backend Routing</li>
+<li>Caching</li>
+<li>API Gateway (rate limiting, API versioning, authentication)</li>
+</ul></li>
+</ul>
+<h2 id="nginx-implementation-example">Nginx Implementation Example</h2>
+<table>
+<colgroup>
+<col style="width: 62%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Before Nginx</th>
+<th>After Nginx</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img src="files/what-is-nginx/before-nginx.png"
+alt="Before Nginx" /></td>
+<td><img src="files/what-is-nginx/after-nginx.png"
+alt="After Nginx" /></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>- The server can get overloaded as number of connections
+increase</td>
+<td>Load balanced with Nginx, backend can scale independently</td>
+</tr>
+<tr class="even">
+<td>- We can spin up multiple servers running on several ports but now
+the clients have to be aware of them too.</td>
+<td>Backend routing with Nginx</td>
+</tr>
+<tr class="odd">
+<td>- The endpoints are not secured, and with multiple servers multiple
+certificates need to be issued (or copied to each)</td>
+<td>Can issue one certificate with Nginx, multiple certificates not
+required</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><em>Nginx benefits don’t come for free as it is an extra layer and
+there is some overhead, that is why Nginx or any reverse proxy has to be
+as efficient as possible.</em></p>
+<h2 id="nginx-layer-4-vs-layer-7-proxying">Nginx Layer 4 vs Layer 7
+proxying</h2>
+<ul>
+<li>Layer 4/7 refers to OSI model layers.</li>
+<li>In Layer 4 we see TCP/IP stack only nothing about the app, we have
+access to
+<ul>
+<li>Source IP, Source Port</li>
+<li>Destination IP, Destination Port</li>
+<li>Simple packet inspection (SYN/TLS hello)</li>
+</ul></li>
+<li>In Layer 7 we see the application, HTTP/ gRPC etc..
+<ul>
+<li>We have access to more context</li>
+<li>I know where the client is going, which page they are visiting</li>
+<li>Require decryption</li>
+</ul></li>
+<li>See <a href="../networking/">networking notes</a> for more.</li>
+<li>NGINX can operate in Layer 7 (e.g. http) or Layer 4 (tcp)</li>
+<li>Layer 4 proxying is useful when NGINX doesn’t understand the
+protocol (MySQL database protocol)</li>
+<li>Layer 7 proxying is useful when NGINX want to share backend
+connections and cache results</li>
+<li>Using <code>stream</code> context it becomes a layer 4 proxy</li>
+<li>Using <code>http</code> context it becomes a layer 7 proxy</li>
+</ul>
+<h2 id="tls-termination-and-tls-passthrough">TLS Termination and TLS
+Passthrough</h2>
+<ul>
+<li>TLS stands for Transport Layer Security</li>
+<li>It is a way to establish end-to-end encryption between one
+another</li>
+<li>Symmetric encryption is used for communication (client/server has
+the same key)</li>
+<li>Asymmetric encryption is used initially to exchange the symmetric
+key (diffie hellman)</li>
+<li>Encryption alone, whether symmetric or asymmetric, doesn’t guarantee
+the identity of communication parties. A middleman can pose as an
+authority, so Certificate Authorities (CAs) and verification methods are
+crucial for distinguishing between authorized and non-authorized
+entities, as encryption’s primary role is content protection, not
+identity validation.</li>
+<li>See <a href="../networking/">networking notes</a> for more.</li>
+</ul>
+<h3 id="tls-termination">TLS Termination</h3>
+<ul>
+<li>Even if NGINX has TLS (e.g. HTTPS) backend may or may not. For
+private server environment HTTP is fine if shielded by TLs at Nginx’s
+layer. In this case NGINX terminates TLS, decrypts and sends
+unencrypted.</li>
+<li>If NGINX is TLS and backend is also TLS ( HTTPS ). NGINX terminates
+TLS, decrypts, optionally rewrite headers and then re-encrypt the
+content to the backend. This introduces latency so the ciphers have to
+be fast and performant.</li>
+<li>While NGINX can inspect Layer 7 (L7) data, rewrite headers, and
+cache content, it either needs to have its own SSL/TLS certificate or
+share the certificate used by the backend server. This certificate is
+essential for encrypting and decrypting data between NGINX and the
+backend.</li>
+<li>Suitable for Load Balancing and Content Modification.</li>
+<li>Shared Certificates for a Single Domain.</li>
+</ul>
+<h3 id="tls-passthrough">TLS Passthrough</h3>
+<ul>
+<li>If the Backend has TLS, NGINX can be used to just to proxy/stream
+the packets directly to the backend. In this case Nginx doesn’t respond
+to the ‘TLS Hello’ as it is not authorized to terminate TLS. The TLS
+handshake is forwarded all the way to the backend just like a tunnel and
+back.</li>
+<li>There is no caching</li>
+<li>There are L4 check only, but more secure as NGINX doesn’t need the
+backend certificate.</li>
+<li>Preferred for End-to-End Encryption and Enhanced Security.</li>
+<li>Appropriate When Content Inspection or Modification Is Not
+Required.</li>
+<li>One disadvantage is that Nginx cannot share backend connections,
+every request will have a new connection and that can be costly.</li>
+</ul>
+</body>
+</html>
