@@ -22,7 +22,7 @@ mainfont: Arial, Palatino, Georgia, Times
 
 | Before Nginx                                                                                                           | After Nginx                                                              |
 | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ![Before Nginx](files/what-is-nginx/before-nginx.png)                                                                  | ![After Nginx](files/what-is-nginx/after-nginx.png)                      |
+| ![Before Nginx](what-is-nginx/before-nginx.png)                                                                  | ![After Nginx](what-is-nginx/after-nginx.png)                      |
 |                                                                                                                        |                                                                          |
 | - The server can get overloaded as number of connections increase                                                      | Load balanced with Nginx, backend can scale independently                |
 | - We can spin up multiple servers running on several ports but now the clients have to be aware of them too.           | Backend routing with Nginx                                               |
@@ -79,3 +79,22 @@ _Nginx benefits don't come for free as it is an extra layer and there is some ov
 -   Preferred for End-to-End Encryption and Enhanced Security.
 -   Appropriate When Content Inspection or Modification Is Not Required.
 -   One disadvantage is that Nginx cannot share backend connections, every request will have a new connection and that can be costly.
+
+## Nginx Internal Architecture
+
+-   Nginx has a 'master process' that coordinates all other Nginx processes. It also manages caching, reading it from disk, and refreshing caches.
+-   The primary focus is on 'worker processes', responsible for most of the work. Worker processes handle connections and requests.
+-   When Nginx is in 'auto' mode, worker processes are spawned based on the number of hardware threads on the server. Hardware threads can simulate multiple cores (with [hyper-threading](https://www.intel.com/content/www/us/en/gaming/resources/hyper-threading.html)), e.g., 4 cores can simulate 8 hardware threads.
+
+    ![Nginx Master and Worker Processes](what-is-nginx/nginx-master-worker-proceses.png)
+
+
+-   When a client establishes a TCP connection to Nginx, connections are initially placed in a Syn queue and then moved to an accept queue. The kernel manages the queue but it's allocated by Nginx.
+
+- Worker processes retrieve connections from the accept queue. Worker processes are responsible for request handling. Each worker process is pinned to a CPU core to minimize context switches as Request handling involves CPU-intensive tasks.
+
+-   Some requests are IO bound, requiring reading content from disk, making upstream network requests or writing to sockets(i.e writing a response which may also involve encryption). These IO-bound operations can be slow and cause waits, hence Nginx performs event-driven IO, allowing the process to perform other tasks during IO wait.
+
+-   Nginx scales by adding more worker processes to handle incoming connections. Each worker process can manage multiple connections simultaneously. Load balancing distributes connections among worker processes. The number of worker processes depends on server hardware and usage patterns.
+
+See also [How Nginx is Designed for Performance and Scale](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/)

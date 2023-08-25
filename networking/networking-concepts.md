@@ -5,7 +5,7 @@ bibliography: "../references.bib"
 
 ## Slides
 
-[Slides](files/networking-concepts/Fundamentals+of+Networking+for+Effective+Backends-v5.pdf) from [Hussein Nasser's Networking Course](https://www.udemy.com/course/fundamentals-of-networking-for-effective-backend-design/)
+[Slides](networking-concepts/Fundamentals+of+Networking+for+Effective+Backends-v5.pdf) from [Hussein Nasser's Networking Course](https://www.udemy.com/course/fundamentals-of-networking-for-effective-backend-design/)
 
 ## Standard communication models for Networking
 
@@ -71,7 +71,7 @@ _Note [Optimization]_ Keeping your server and database in the same subnet will b
 
 [IP](https://en.wikipedia.org/wiki/Internet_Protocol) is the network layer communications protocol.
 
-![IP packet](files/networking-concepts/ip-packet.png)
+![IP packet](networking-concepts/ip-packet.png)
 
 IP Addresses are a layer 3 property. Can be set automatically or statically, has **network** and **host** portions. 4 bytes in IPv4 - 32 bits.
 
@@ -81,7 +81,7 @@ IP Addresses are a layer 3 property. Can be set automatically or statically, has
 
 It is used by network devices, including routers, to send error messages and operational information indicating success or failure when communicating with another IP address. It is used by ping and traceroute.
 
-![ICMP Header](files/networking-concepts/icmp-header.png)
+![ICMP Header](networking-concepts/icmp-header.png)
 
 -   `ping google.com`
 -   `traceroute google.com`
@@ -100,7 +100,7 @@ Layer 4 protocol, sits on top of the IP protocol (Network layer). While IP can a
 -   Games
 -   P2P
 
-![UDP Datagram Header](files/networking-concepts/udp-datagram-header.png)
+![UDP Datagram Header](networking-concepts/udp-datagram-header.png)
 
 Multiplexing (many to one) and demultiplexing (one to many). IP targets hosts only. Each host can have multiple applications running. Ports can be used to identify the 'apps' or 'processes'. The sender multiplexes all inputs into single IP packets into UDP, and the receiver demultiplexes UDP datagrams in IP packets to each app or process. A four-tuple (Source IP, Source Port, Destination IP, Destination Port) can represent every communication between two devices.
 
@@ -138,7 +138,7 @@ Similar to UDP, it's a Layer 4 protocol and can address processes in a host usin
 -   Web Communications (HTTP1, HTTP2 is built on top of TCP, HTTP3 is built on top of QUIC which is built on top of UDP and aims to be better than TCP)
 -   Any bidirectional communication
 
-![TCP Segment](files/networking-concepts/tcp-segment.png)
+![TCP Segment](networking-concepts/tcp-segment.png)
 
 TCP Connection is a Layer 5 (session) concept. The connection between client and server must be there to send data, can't send data outside of a connection, requires a 3-way TCP handshake.
 
@@ -166,7 +166,7 @@ The Transmission Control Protocol differs in several key features compared to th
     -   Employing the "Sliding Window" mechanism eliminates the need to wait for acknowledgments after each segment.
     -   The sender dynamically adjusts its window based on the receiver's available capacity.
     -   This "Sliding Window" approach ensures continuous data flow while considering the receiver's limits.
-        ![Window Sliding](files/networking-concepts/tcp-window-sliding.png)
+        ![Window Sliding](networking-concepts/tcp-window-sliding.png)
     -   "Window Scaling" is introduced to address limitations of the default window size, especially for larger data transfers.
     -   Negotiated during the handshake, "Window Scaling" involves a scaling factor that extends the window size beyond the 64KB limit
 
@@ -184,7 +184,7 @@ The Transmission Control Protocol differs in several key features compared to th
         -   Send 1 Segment and waits for ACK
         -   With EACH ACK received CWND is incremented by 1 MSS
         -   Until we reach slow start threshold (ssthresh) we switch to congestion avoidance algorithm
-            ![Slow Start](files/networking-concepts/tcp-slow-start.png)
+            ![Slow Start](networking-concepts/tcp-slow-start.png)
 
     -   Congestion Avoidance:
 
@@ -193,15 +193,15 @@ The Transmission Control Protocol differs in several key features compared to th
         -   Only when ALL segments are ACKed add UP to one MSS to CWND
         -   Precisely CWND = CWND + MSS\*MSS/CWND
         -   "Sliding Window" mechanism helps manage congestion efficiently. CWND must not exceed Receiver Window (RWND).
-            ![Congestion Avoidance](files/networking-concepts/tcp-congestion-avoidance.png)
+            ![Congestion Avoidance](networking-concepts/tcp-congestion-avoidance.png)
         -   If timeouts, duplicate ACKs, or packet drops occur, congestion is detected.
         -   The moment we get timeouts, dup ACKs or packet drops
         -   The slow start threshold reduced to the half of whatever unacknowledged data is sent (roughly CWND/2 if all CWND worth of data is unacknowledged)
         -   The CWND is reset to 1 and we start over.
         -   Min slow start threshold is 2\*MSS
-            ![Congestion Detection](files/networking-concepts/tcp-congestion-detection.png)
+            ![Congestion Detection](networking-concepts/tcp-congestion-detection.png)
 
-        ![Slow Start vs Congestion Avoidance](files/networking-concepts/tcp-slow-start-vs-congestion-detection.png)
+        ![Slow Start vs Congestion Avoidance](networking-concepts/tcp-slow-start-vs-congestion-detection.png)
 
     -   Explicit Congestion Notification (ECN):
         -   We don’t want routers dropping packets
@@ -334,7 +334,7 @@ By definition TCP is a stateful protocol and it has states. Both client and serv
 
 When the server sends the last **fin**, the client after receiving it sends the last **ack** to the server. The server can now **CLOSE**. Basically there is no further communication from the server. The client doesn't really know if the server received the **ack** or not (also called the [Two Generals' Problem](https://en.wikipedia.org/wiki/Two_Generals%27_Problem)). The client now goes into a **TIME_WAIT** state, which is 4 minutes [`2 MSL(Maximum Segment Length)`].
 
-![TCP Socket States](files/networking-concepts/tcp-socket-states.png)
+![TCP Socket States](networking-concepts/tcp-socket-states.png)
 
 _Note [Optimization]_ Whoever requests the **fin** will end up in the **TIME_WAIT** state. We wouldn't want the server to be flooded with these waits when closing connections. If you own the frontend and the backend, you can design a protocol such that you send a request so that the client can instantiate the **fin** for you. The client will be in the **TIME_WAIT** state, which will free up the server.
 
@@ -352,7 +352,7 @@ While TCP is a reliable protocol for connections it has some disadvantages.
 -   Request 2 is segments 3,4
 -   Segments 2,3,4 arrive but 1 is lost(probably took a different path through the router to arrive later or got congested and was dropped)?
 -   Request 2 technically was delivered but TCP is blocking it
-    ![TCP HOL](files/networking-concepts/tcp-hol.png)
+    ![TCP HOL](networking-concepts/tcp-hol.png)
 -   Huge latency in apps, big problem in HTTP/2 with streams
 -   QUIC solves this
 
@@ -385,9 +385,9 @@ Essentially, the MSS is equal to MTU minus the size of a TCP header and an IP he
 
 $$ MTU - (TCP header + IP header) = MSS $$
 
-![A data packet](files/networking-concepts/data-packet.png)
+![A data packet](networking-concepts/data-packet.png)
 
-![Data Frame](files/networking-concepts/data-frame.png)
+![Data Frame](networking-concepts/data-frame.png)
 
 One of the key differences between MTU and MSS is that if a packet exceeds a device's MTU, it is broken up into smaller pieces, or "fragmented." These frames then have to be assembled and then the frame itself has to have 'More Fragments (MF)' bit set in it's flags. In contrast, if a packet exceeds the MSS, it is dropped and not delivered.
 
@@ -403,7 +403,7 @@ Check MTU in a linux machine
 
 MTU is a network interface property; each host can have a different value. You really need to use the smallest MTU in the network. Path MTU helps determine the MTU on the network path. The client sends an IP packet with its MTU(in the options field of the IP header) and a DF flag. The host with a smaller MTU will need to fragment but can't. The host sends back an ICMP message indicating fragmentation is needed(Type 3 – Destination Unreachable: Code 4 Fragmentation required, and DF flag set), which will lower the MTU. Path MTU can discover the network's lowest MTU with ICMP.
 
-![Path MTU Discovery](files/networking-concepts/path-mtud.png)
+![Path MTU Discovery](networking-concepts/path-mtud.png)
 
 ### Nagle's Algorithm and Delayed Acknowledgement
 
@@ -428,7 +428,7 @@ end if
 
 The wait can be perceived as a delay in the client side. The problem with Nagle's algorithm arises when sending substantial data, leading to delays, such as attempting to transmit 5000 bytes using a 1460 MSS; the first three full segments are 1460 bytes each, leaving 620 bytes, and interestingly, the fourth segment, even though not full, is only sent upon receiving an acknowledgment (ACK).
 
-![Nagle's Algortithm on large data](files/networking-concepts/nagle-large-data.png)
+![Nagle's Algortithm on large data](networking-concepts/nagle-large-data.png)
 
 Modern clients commonly disable Nagle's algorithm, favoring performance over minimal bandwidth conservation. This is achieved through options like `TCP_NODELAY`. For instance, Curl disabled Nagle's algorithm by default in 2016 due to its negative impact on the TLS handshake process. More details can be found in this [commit](https://github.com/curl/curl/commit/4732ca5724072f132876f520c8f02c7c5b654d9).
 
@@ -498,7 +498,7 @@ Derived from SSL, initially SSL 3.1. "TLS" and "SSL" terms used interchangeably 
 -   Unencrypted protocol for data transmission over the web.
 -   Data sent in plain text, susceptible to interception and eavesdropping.
 
-    ![HTTP TCP Handshake](files/networking-concepts/http-tcp-handshake.png)
+    ![HTTP TCP Handshake](networking-concepts/http-tcp-handshake.png)
 
 **HTTPS (Hypertext Transfer Protocol Secure):**
 
@@ -506,7 +506,7 @@ Derived from SSL, initially SSL 3.1. "TLS" and "SSL" terms used interchangeably 
 -   Uses encryption to safeguard data during transmission.
 -   Employs a handshake process to set up secure communication.
 
-    ![HTTPS TCP Handshake](files/networking-concepts/https-tcp-handshake.png)
+    ![HTTPS TCP Handshake](networking-concepts/https-tcp-handshake.png)
 
 **Handshake and Key Exchange:**
 
@@ -536,7 +536,7 @@ Modern cryptographic algorithms like AES are used for symmetric encryption in HT
 
 **TLS 1.2**
 
-![TLS 1.2](files/networking-concepts/tls-1_2.png)
+![TLS 1.2](networking-concepts/tls-1_2.png)
 
 TLS 1.2 relies on the RSA asymmetric encryption algorithm. Here's the handshake process in this version:
 
@@ -552,11 +552,11 @@ The TLS 1.2 handshake involves two round trips. However, a challenge with this a
 **Diffie-Hellman Key Exchange**
 Diffie-Hellman key exchange is used instead of RSA for achieving forward secrecy. This involves two private keys and one public key to generate a shared symmetric key.
 
-![Diffie Hellman](files/networking-concepts/diffie-hellman-1.png)
-![Diffie Hellman](files/networking-concepts/diffie-hellman-2.png)
+![Diffie Hellman](networking-concepts/diffie-hellman-1.png)
+![Diffie Hellman](networking-concepts/diffie-hellman-2.png)
 
 **TLS 1.3**
-![TLS 1.3](files/networking-concepts/tls-1_3.png)
+![TLS 1.3](networking-concepts/tls-1_3.png)
 
 In TLS 1.3, the process is enhanced. Here's the updated handshake process:
 
@@ -606,7 +606,7 @@ TLS 1.3 introduces several improvements, including the potential for a one-round
     -   Client stores TFO cookie.
     -   For subsequent connection, client sends SYN, data, and TFO cookie in TCP options.
     -   Server authenticates cookie, responds with SYN/ACK + response.
-        ![TCP Fast Open](files/networking-concepts/tcp-fast-open.png)
+        ![TCP Fast Open](networking-concepts/tcp-fast-open.png)
 -   We can still get TCP Slow start with TCP Fast open. We can take advantage of this feature to send early data
 -   Default in Linux 3.13 and newer.
 -   Enable TFO with --tcp-fastopen option in curl.
