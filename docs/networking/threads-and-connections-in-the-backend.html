@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Labin Ojha" />
+  <title>Threads And Connections In The Backend</title>
+  <style>
+    html {
+      font-family: Arial, Palatino, Georgia, Times;
+      font-size: 11.5pt;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Threads And Connections In The Backend</h1>
+<p class="author">Labin Ojha</p>
+</header>
+<p>From <a
+href="https://medium.com/@hnasr/threads-and-connections-in-backend-applications-a225eed3eddb">Threads
+and Connections in Backend Applications</a></p>
+<p>In networked backend applications employing TCP as the transport
+protocol, a variety of essential elements come into play:</p>
+<p><strong>Fundamental Components:</strong></p>
+<ol type="1">
+<li><p><strong>Communication Protocol</strong>:</p>
+<ul>
+<li><em>Definition</em>: TCP (Transmission Control Protocol) is a
+frequently chosen protocol for its dependable, connection-oriented
+communication.</li>
+</ul></li>
+<li><p><strong>Port to Bind to</strong>:</p>
+<ul>
+<li><em>Definition</em>: The backend application binds to a specific IP
+address and port, enabling it to listen for incoming connections.</li>
+</ul></li>
+<li><p><strong>Process to Serve Requests and Produce
+Responses</strong>:</p>
+<ul>
+<li><em>Definition</em>: The backend process is responsible for
+accepting incoming connections, reading data from them, processing the
+data to comprehend requests, and delivering suitable responses.</li>
+</ul></li>
+</ol>
+<p>When dealing with TCP, the establishment of a stateful connection
+between the client and the backend is crucial. Before this connection
+can be established, the backend must actively accept incoming
+connections, as connections left unaccepted can accumulate in the
+operating system’s backlog buffer.</p>
+<p><strong>Key Roles and Definitions:</strong></p>
+<ol type="1">
+<li><p><strong>Listener</strong>:</p>
+<ul>
+<li><em>Definition</em>: The listener is a component within the backend
+application that assumes the responsibility of generating a socket and
+actively listening on a specific IP address and port. It waits for
+incoming connection requests from clients.</li>
+<li><em>Analogy</em>: Think of it as an electrical wall socket into
+which devices (connections) can be plugged.</li>
+</ul></li>
+<li><p><strong>Acceptor</strong>:</p>
+<ul>
+<li><em>Definition</em>: The acceptor is either a thread or a process
+within the backend application that manages the task of accepting
+incoming connections. When a connection request arrives, the acceptor
+takes charge of the process.</li>
+<li><em>Function</em>: Its role encompasses calling the operating
+system’s “accept” function to accept connections on behalf of the
+application.</li>
+</ul></li>
+<li><p><strong>Reader</strong> (or Worker):</p>
+<ul>
+<li><em>Definition</em>: The reader, often referred to as a worker,
+serves as a component responsible for reading data from an established
+connection. It processes the raw byte stream received over the TCP
+connection.</li>
+<li><em>Function</em>: It takes the file descriptor representing the
+connection and reads the data from the OS buffer, converting it into
+meaningful requests or messages for the application layer.</li>
+</ul></li>
+<li><p><strong>TCP Stream</strong>:</p>
+<ul>
+<li><em>Definition</em>: A TCP stream denotes the continuous flow of raw
+bytes transmitted between a client and a server over a TCP connection.
+It constitutes a sequence of data without clear boundaries or
+structure.</li>
+<li><em>Characteristics</em>: TCP, as a streaming protocol, does not
+define message boundaries or structure; instead, it delivers an
+uninterrupted stream of bytes.</li>
+</ul></li>
+<li><p><strong>Requests</strong> (in the context of TCP):</p>
+<ul>
+<li><em>Definition</em>: Requests, in this context, signify meaningful
+data or messages constructed from the raw TCP stream. This process
+involves parsing the stream to identify the commencement and conclusion
+of individual requests.</li>
+<li><em>Challenge</em>: Parsing raw bytes into requests can be
+intricate, especially in Layer 7 protocols like HTTP, HTTP/2, gRPC, and
+SSH, where messages possess distinct formats.</li>
+</ul></li>
+</ol>
+<p><strong>Architectural Patterns:</strong></p>
+<p>The management of these connections entails various architectural
+patterns, each revolving around the handling of threads and
+connections:</p>
+<ol type="1">
+<li><p><strong>Single Threaded Architecture</strong>:</p>
+<ul>
+<li><em>Description</em>: This is a straightforward approach where the
+backend application operates on a single thread.</li>
+<li><em>Functionality</em>: This single thread performs tasks such as
+listening for incoming connections, accepting them, and reading data
+from these connections.</li>
+<li><em>Usage</em>: It is commonly employed in environments like
+Node.js, which achieves scalability by running multiple instances of
+this single-threaded application.</li>
+</ul>
+<figure>
+<img src="threads-and-connections-in-the-backend/single-thread.png"
+alt="Single Threaded" />
+<figcaption aria-hidden="true">Single Threaded</figcaption>
+</figure></li>
+<li><p><strong>Multiple Threads Single Acceptor
+Architecture</strong>:</p>
+<ul>
+<li><em>Description</em>: This architecture leverages multithreading to
+harness the power of multiple CPU cores.</li>
+<li><em>Operation</em>: There is still a single thread responsible for
+listening and accepting connections.</li>
+<li><em>Handling Connections</em>: Each accepted connection is delegated
+to a separate thread, which manages the reading and processing of
+data.</li>
+<li><em>Considerations</em>: It’s imperative to exercise caution to
+prevent excessive memory consumption due to thread creation and context
+switching.</li>
+<li><em>Example</em>: This approach mirrors the one used by
+memcached.</li>
+</ul>
+<figure>
+<img
+src="threads-and-connections-in-the-backend/multiple-threads-single-acceptor.png"
+alt="Multiple Threads Single Acceptor" />
+<figcaption aria-hidden="true">Multiple Threads Single
+Acceptor</figcaption>
+</figure></li>
+<li><p><strong>Multiple Threads Multiple Acceptors
+Architecture</strong>:</p>
+<ul>
+<li><em>Description</em>: This architecture bears similarities to the
+previous one but introduces a slight variation.</li>
+<li><em>Socket Placement</em>: The socket resides in shared memory
+accessible by multiple threads.</li>
+<li><em>Operation</em>: The listener thread spawns worker threads that
+independently call the accept function on the shared socket.</li>
+<li><em>Challenges</em>: Despite being an improvement over the single
+acceptor model, it may still encounter contention and blocking due to
+mutex usage.</li>
+</ul>
+<figure>
+<img
+src="threads-and-connections-in-the-backend/multiple-thread-multiple-acceptor.png"
+alt="Multiple Thread Multiple Acceptor" />
+<figcaption aria-hidden="true">Multiple Thread Multiple
+Acceptor</figcaption>
+</figure></li>
+<li><p><strong>Multiple Threads with Message-based Load Balancing
+Architecture</strong>:</p>
+<ul>
+<li><em>Description</em>: This architecture draws inspiration from
+protocols like Homa and finds use in systems like RAMCloud.</li>
+<li><em>Operation</em>: The listener thread focuses on accepting,
+reading, and parsing logical messages (requests) rather than raw
+connections.</li>
+<li><em>Load Balancing</em>: Parsed messages are subsequently
+distributed to worker threads for processing, facilitating load
+balancing.</li>
+<li><em>Considerations</em>: The listener thread might become a
+potential bottleneck as it juggles both connections and message
+parsing.</li>
+</ul>
+<figure>
+<img
+src="threads-and-connections-in-the-backend/multiple-threads-with-message-based-load-balancing.png"
+alt="Multiple Threads with Message-based Load Balancing" />
+<figcaption aria-hidden="true">Multiple Threads with Message-based Load
+Balancing</figcaption>
+</figure></li>
+<li><p><strong>Multiple Threads with Socket Sharding
+(SO_REUSEPORT)</strong>:</p>
+<ul>
+<li><em>Description</em>: This approach circumvents the constraint of a
+single process binding to a port.</li>
+<li><em>Usage</em>: Multiple processes can listen on the same port by
+employing the SO_REUSEPORT socket option.</li>
+<li><em>Connection Handling</em>: Connections are allocated to these
+processes, and accept calls are no longer serialized.</li>
+<li><em>Adoption</em>: NGINX, Envoy, and HAProxy have embraced this
+approach.</li>
+</ul>
+<figure>
+<img
+src="threads-and-connections-in-the-backend/multiple-threads-with-socket-sharding.png"
+alt="Multiple Threads with Socket Sharding" />
+<figcaption aria-hidden="true">Multiple Threads with Socket
+Sharding</figcaption>
+</figure></li>
+</ol>
+<p>It’s crucial to recognize that these architectural patterns can be
+combined creatively to align with specific application requirements. For
+example, the fusion of socket sharding with message-based load balancing
+could yield enhanced performance and load distribution. Each pattern
+boasts its own merits and trade-offs, and the selection hinges on
+factors such as scalability demands, latency considerations, and the
+availability of hardware resources.</p>
+</body>
+</html>

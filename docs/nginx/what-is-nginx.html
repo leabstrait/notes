@@ -203,10 +203,8 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td><img src="files/what-is-nginx/before-nginx.png"
-alt="Before Nginx" /></td>
-<td><img src="files/what-is-nginx/after-nginx.png"
-alt="After Nginx" /></td>
+<td><img src="what-is-nginx/before-nginx.png" alt="Before Nginx" /></td>
+<td><img src="what-is-nginx/after-nginx.png" alt="After Nginx" /></td>
 </tr>
 <tr class="even">
 <td></td>
@@ -315,5 +313,44 @@ Required.</li>
 <li>One disadvantage is that Nginx cannot share backend connections,
 every request will have a new connection and that can be costly.</li>
 </ul>
+<h2 id="nginx-internal-architecture">Nginx Internal Architecture</h2>
+<ul>
+<li><p>Nginx has a ‘master process’ that coordinates all other Nginx
+processes. It also manages caching, reading it from disk, and refreshing
+caches.</p></li>
+<li><p>The primary focus is on ‘worker processes’, responsible for most
+of the work. Worker processes handle connections and requests.</p></li>
+<li><p>When Nginx is in ‘auto’ mode, worker processes are spawned based
+on the number of hardware threads on the server. Hardware threads can
+simulate multiple cores (with <a
+href="https://www.intel.com/content/www/us/en/gaming/resources/hyper-threading.html">hyper-threading</a>),
+e.g., 4 cores can simulate 8 hardware threads.</p>
+<figure>
+<img src="what-is-nginx/nginx-master-worker-proceses.png"
+alt="Nginx Master and Worker Processes" />
+<figcaption aria-hidden="true">Nginx Master and Worker
+Processes</figcaption>
+</figure></li>
+<li><p>When a client establishes a TCP connection to Nginx, connections
+are initially placed in a Syn queue and then moved to an accept queue.
+The kernel manages the queue but it’s allocated by Nginx.</p></li>
+<li><p>Worker processes retrieve connections from the accept queue.
+Worker processes are responsible for request handling. Each worker
+process is pinned to a CPU core to minimize context switches as Request
+handling involves CPU-intensive tasks.</p></li>
+<li><p>Some requests are IO bound, requiring reading content from disk,
+making upstream network requests or writing to sockets(i.e writing a
+response which may also involve encryption). These IO-bound operations
+can be slow and cause waits, hence Nginx performs event-driven IO,
+allowing the process to perform other tasks during IO wait.</p></li>
+<li><p>Nginx scales by adding more worker processes to handle incoming
+connections. Each worker process can manage multiple connections
+simultaneously. Load balancing distributes connections among worker
+processes. The number of worker processes depends on server hardware and
+usage patterns.</p></li>
+</ul>
+<p>See also <a
+href="https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/">How
+Nginx is Designed for Performance and Scale</a></p>
 </body>
 </html>
