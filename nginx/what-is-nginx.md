@@ -22,7 +22,7 @@ mainfont: Arial, Palatino, Georgia, Times
 
 | Before Nginx                                                                                                           | After Nginx                                                              |
 | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ![Before Nginx](what-is-nginx/before-nginx.png)                                                                  | ![After Nginx](what-is-nginx/after-nginx.png)                      |
+| ![Before Nginx](what-is-nginx/before-nginx.png)                                                                        | ![After Nginx](what-is-nginx/after-nginx.png)                            |
 |                                                                                                                        |                                                                          |
 | - The server can get overloaded as number of connections increase                                                      | Load balanced with Nginx, backend can scale independently                |
 | - We can spin up multiple servers running on several ports but now the clients have to be aware of them too.           | Backend routing with Nginx                                               |
@@ -84,14 +84,24 @@ _Nginx benefits don't come for free as it is an extra layer and there is some ov
 
 -   Nginx has a 'master process' that coordinates all other Nginx processes. It also manages caching, reading it from disk, and refreshing caches.
 -   The primary focus is on 'worker processes', responsible for most of the work. Worker processes handle connections and requests.
--   When Nginx is in 'auto' mode, worker processes are spawned based on the number of hardware threads on the server. Hardware threads can simulate multiple cores (with [hyper-threading](https://www.intel.com/content/www/us/en/gaming/resources/hyper-threading.html)), e.g., 4 cores can simulate 8 hardware threads.
 
     ![Nginx Master and Worker Processes](what-is-nginx/nginx-master-worker-proceses.png)
 
+-   When Nginx is in 'auto' mode, worker processes are spawned based on the number of hardware threads on the server. Hardware threads can simulate multiple cores (with [hyper-threading](https://www.intel.com/content/www/us/en/gaming/resources/hyper-threading.html)), e.g., 4 cores can simulate 8 hardware threads.
+
+-   **NGINX Threading Architecture**
+
+    -   When NGINX reverse proxy starts it creates one thread per CPU core and these worker threads do the heavy lifting. The number of worker threads are configurable but NGINX recommends one thread per CPU core to avoid context switching and cache thrashing. In older versions of NGINX all threads accept connections by competing on the shared listener socket (by default only one process can listen on IP/port pair). In recent versions of NGINX this was changed to use socket sharding (through SO_REUSEPORT socket option) which allows multiple threads to listen on the same port and the OS will load balance connections on each accept queue.
+
+    | Multiple Threads Single Acceptor Architecture                                                     | Multiple Threads with Socket Sharding (SO_REUSEPORT)                                                          |
+    | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+    | ![Nginx Multiple Thread Single Acceptor](what-is-nginx/nginx-multiple-thread-single-acceptor.png) | ![Nginx Multiple Threads with Socket Sharding](what-is-nginx/nginx-multiple-threads-with-socket-sharding.png) |
+
+    See more at [Threads And Connections In The Backend](../networking/threads-and-connections-in-the-backend.html)
 
 -   When a client establishes a TCP connection to Nginx, connections are initially placed in a Syn queue and then moved to an accept queue. The kernel manages the queue but it's allocated by Nginx.
 
-- Worker processes retrieve connections from the accept queue. Worker processes are responsible for request handling. Each worker process is pinned to a CPU core to minimize context switches as Request handling involves CPU-intensive tasks.
+-   Worker processes retrieve connections from the accept queue. Worker processes are responsible for request handling. Each worker process is pinned to a CPU core to minimize context switches as Request handling involves CPU-intensive tasks.
 
 -   Some requests are IO bound, requiring reading content from disk, making upstream network requests or writing to sockets(i.e writing a response which may also involve encryption). These IO-bound operations can be slow and cause waits, hence Nginx performs event-driven IO, allowing the process to perform other tasks during IO wait.
 
