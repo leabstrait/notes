@@ -108,3 +108,99 @@ _Nginx benefits don't come for free as it is an extra layer and there is some ov
 -   Nginx scales by adding more worker processes to handle incoming connections. Each worker process can manage multiple connections simultaneously. Load balancing distributes connections among worker processes. The number of worker processes depends on server hardware and usage patterns.
 
 See also [How Nginx is Designed for Performance and Scale](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/)
+
+## Nginx Timeouts
+
+In Nginx, timeouts are settings that determine how long the server should wait for certain events to occur before considering them as failures. It is critical to ensure efficient use of resources so you don't let a runaway process run for a very long time and consume all the resources and then the client keeps waiting.
+
+### Frontend Timeouts (when clients talk to Nginx)
+
+1. **client_header_timeout:**
+
+    - **Description:** `client_header_timeout` specifies the maximum time Nginx will wait for a client to send the request header, including request method, URI, and HTTP headers.
+    - **Use Case:** It's valuable in ensuring that clients send their request headers within an acceptable time frame, preventing slow or unresponsive clients from tying up server resources.
+    - **Benefit:** Enhances server performance by managing slow or misbehaving clients effectively and preventing resource exhaustion.
+    - **Status Code:** 408 Request Timeout (if exceeded)
+    - **Default Value:** 60s
+
+2. **client_body_timeout:**
+
+    - **Description:** This timeout determines how long Nginx waits for the client to send the request body, commonly used for HTTP POST requests that include data.
+    - **Use Case:** In scenarios where clients submit forms, upload files, or provide data via POST requests, `client_body_timeout` ensures timely receipt of this data.
+    - **Benefit:** Prevents connections from remaining open indefinitely for slow clients, optimizing server resource usage and responsiveness.
+    - **Status Code:** 408 Request Timeout (if exceeded)
+    - **Default Value:** 60s
+
+3. **send_timeout:**
+
+    - **Description:** `send_timeout` specifies the maximum time Nginx waits to send data to the client once the response has started.
+    - **Use Case:** In applications like live streaming or real-time communication, timely data delivery is essential for a smooth user experience.
+    - **Benefit:** Ensures that data is sent to clients promptly, preventing long delays and potential client-side timeouts, crucial for real-time applications.
+    - **Status Code:** 408 Request Timeout (if exceeded)
+    - **Default Value:** 60s
+
+4. **keepalive_timeout:**
+
+    - **Description:** This timeout defines how long Nginx keeps a client connection open for potential reuse, allowing multiple requests over the same connection.
+    - **Use Case:** In websites serving multiple assets (HTML, CSS, JavaScript, images) on a single page, reusing connections reduces latency and improves load times.
+    - **Benefit:** Reduces connection overhead and improves performance by reusing connections for multiple requests from the same client.
+    - **Status Code:** Not applicable (connection management)
+    - **Default Value:** 75s
+
+5. **lingering_timeout:**
+
+    - **Description:** `lingering_timeout` determines how long Nginx keeps a closed ([lingering_close](http://nginx.org/en/docs/http/ngx_http_core_module.html#lingering_close)) client connection open to handle late responses. It is used in cases where Nginx serves cached responses and needs to close the connection gracefully.
+    - **Use Case:** Useful for serving cached content and ensuring that clients receive responses even if the connection is closed before the server generates the entire response.
+    - **Benefit:** Provides a better user experience by allowing clients to receive cached content despite a closed connection, reducing the need for new connections.
+    - **Status Code:** Not applicable (connection management)
+    - **Default Value:** 5s
+
+6. **resolver_timeout:**
+    - **Description:** `resolver_timeout` sets the maximum time Nginx will wait for DNS resolution when proxying requests to upstream servers.
+    - **Use Case:** When Nginx acts as a reverse proxy and needs to resolve the DNS of upstream servers, this timeout ensures that DNS resolution doesn't cause delays.
+    - **Benefit:** Prevents unnecessary delays in request processing due to slow DNS resolution, ensuring timely delivery of content.
+    - **Status Code:** 408 Request Timeout (if exceeded)
+    - **Default Value:** 30s
+
+### Backend Timeouts (when Nginx talks to backends)
+
+1. **proxy_connect_timeout:**
+
+    - **Description:** `proxy_connect_timeout` specifies the maximum time Nginx waits to establish a connection with a backend server.
+    - **Use Case:** In a reverse proxy configuration, it helps Nginx quickly identify unresponsive backend servers.
+    - **Benefit:** Ensures that clients are not left waiting indefinitely for content from a problematic backend, improving reliability.
+    - **Status Code:** 502 Bad Gateway (if exceeded)
+    - **Default Value:** 60s
+
+2. **proxy_send_timeout:**
+
+    - **Description:** This timeout defines the maximum time Nginx waits to send data to the backend server after a connection is established.
+    - **Use Case:** In applications like e-commerce platforms, where requests are forwarded to backend systems for order processing.
+    - **Benefit:** Prevents bottlenecks caused by slow or unresponsive backend servers, maintaining responsiveness for clients and preventing request queuing or timeouts.
+    - **Status Code:** 502 Bad Gateway (if exceeded)
+    - **Default Value:** 60s
+
+3. **proxy_read_timeout:**
+
+    - **Description:** Specifies the maximum time Nginx waits for a response from the backend server.
+    - **Use Case:** Content-heavy websites fetching data from backend databases or applications that rely on various backend services.
+    - **Benefit:** Ensures that clients receive timely responses, preventing unnecessary delays and potential client-side timeouts due to backend issues.
+    - **Status Code:** 504 Gateway Timeout (if exceeded)
+    - **Default Value:** 60s
+
+4. **proxy_next_upstream_timeout:**
+
+    - **Description:** `proxy_next_upstream_timeout` sets the maximum time Nginx waits for a response from the next upstream server in case the current one fails.
+    - **Use Case:** In load-balanced configurations, it allows Nginx to quickly switch to a backup server if the primary one fails to respond.
+    - **Benefit:** Improves fault tolerance and availability by minimizing downtime in case of upstream server failures.
+    - **Status Code:** 502 Bad Gateway (if exceeded)
+    - **Default Value:** 0s
+
+5. **keepalive_timeout:**
+    - **Description:** Already discussed in the frontend section, `keepalive_timeout` also plays a role on the backend for reusing connections between Nginx and upstream servers.
+    - **Use Case:** Helps in maintaining efficient and persistent connections to backend servers, reducing connection overhead.
+    - **Benefit:** Reduces the need to frequently establish new connections to upstream servers, improving performance and reducing latency.
+    - **Status Code:** Not applicable (connection management)
+    - **Default Value:** 75s
+
+Configuring these timeouts accurately based on your specific use cases is vital for optimizing the performance, reliability, and responsiveness of your Nginx web server or reverse proxy while ensuring efficient resource management and graceful handling of client and backend server interactions.
