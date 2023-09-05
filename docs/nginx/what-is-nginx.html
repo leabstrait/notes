@@ -389,5 +389,273 @@ usage patterns.</p></li>
 <p>See also <a
 href="https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/">How
 Nginx is Designed for Performance and Scale</a></p>
+<h2 id="nginx-timeouts">Nginx Timeouts</h2>
+<p>In Nginx, timeouts are settings that determine how long the server
+should wait for certain events to occur before considering them as
+failures. It is critical to ensure efficient use of resources so you
+don’t let a runaway process run for a very long time and consume all the
+resources and then the client keeps waiting.</p>
+<h3 id="frontend-timeouts-when-clients-talk-to-nginx">Frontend Timeouts
+(when clients talk to Nginx)</h3>
+<ol type="1">
+<li><p><strong>client_header_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong> <code>client_header_timeout</code>
+specifies the maximum time Nginx will wait for a client to send the
+request header, including request method, URI, and HTTP headers.</li>
+<li><strong>Use Case:</strong> It’s valuable in ensuring that clients
+send their request headers within an acceptable time frame, preventing
+slow or unresponsive clients from tying up server resources.</li>
+<li><strong>Benefit:</strong> Enhances server performance by managing
+slow or misbehaving clients effectively and preventing resource
+exhaustion.</li>
+<li><strong>Status Code:</strong> 408 Request Timeout (if exceeded)</li>
+<li><strong>Default Value:</strong> 60s</li>
+</ul></li>
+<li><p><strong>client_body_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong> This timeout determines how long Nginx
+waits for the client to send the request body, commonly used for HTTP
+POST requests that include data.</li>
+<li><strong>Use Case:</strong> In scenarios where clients submit forms,
+upload files, or provide data via POST requests,
+<code>client_body_timeout</code> ensures timely receipt of this
+data.</li>
+<li><strong>Benefit:</strong> Prevents connections from remaining open
+indefinitely for slow clients, optimizing server resource usage and
+responsiveness.</li>
+<li><strong>Status Code:</strong> 408 Request Timeout (if exceeded)</li>
+<li><strong>Default Value:</strong> 60s</li>
+</ul></li>
+<li><p><strong>send_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong> <code>send_timeout</code> specifies
+the maximum time Nginx waits to send data to the client once the
+response has started.</li>
+<li><strong>Use Case:</strong> In applications like live streaming or
+real-time communication, timely data delivery is essential for a smooth
+user experience.</li>
+<li><strong>Benefit:</strong> Ensures that data is sent to clients
+promptly, preventing long delays and potential client-side timeouts,
+crucial for real-time applications.</li>
+<li><strong>Status Code:</strong> 408 Request Timeout (if exceeded)</li>
+<li><strong>Default Value:</strong> 60s</li>
+</ul></li>
+<li><p><strong>keepalive_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong> This timeout defines how long Nginx
+keeps a client connection open for potential reuse, allowing multiple
+requests over the same connection.</li>
+<li><strong>Use Case:</strong> In websites serving multiple assets
+(HTML, CSS, JavaScript, images) on a single page, reusing connections
+reduces latency and improves load times.</li>
+<li><strong>Benefit:</strong> Reduces connection overhead and improves
+performance by reusing connections for multiple requests from the same
+client.</li>
+<li><strong>Status Code:</strong> Not applicable (connection
+management)</li>
+<li><strong>Default Value:</strong> 75s</li>
+</ul></li>
+<li><p><strong>lingering_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong> <code>lingering_timeout</code>
+determines how long Nginx keeps a closed (<a
+href="http://nginx.org/en/docs/http/ngx_http_core_module.html#lingering_close">lingering_close</a>)
+client connection open to handle late responses. It is used in cases
+where Nginx serves cached responses and needs to close the connection
+gracefully.</li>
+<li><strong>Use Case:</strong> Useful for serving cached content and
+ensuring that clients receive responses even if the connection is closed
+before the server generates the entire response.</li>
+<li><strong>Benefit:</strong> Provides a better user experience by
+allowing clients to receive cached content despite a closed connection,
+reducing the need for new connections.</li>
+<li><strong>Status Code:</strong> Not applicable (connection
+management)</li>
+<li><strong>Default Value:</strong> 5s</li>
+</ul></li>
+<li><p><strong>resolver_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong> <code>resolver_timeout</code> sets the
+maximum time Nginx will wait for DNS resolution when proxying requests
+to upstream servers.</li>
+<li><strong>Use Case:</strong> When Nginx acts as a reverse proxy and
+needs to resolve the DNS of upstream servers, this timeout ensures that
+DNS resolution doesn’t cause delays.</li>
+<li><strong>Benefit:</strong> Prevents unnecessary delays in request
+processing due to slow DNS resolution, ensuring timely delivery of
+content.</li>
+<li><strong>Status Code:</strong> 408 Request Timeout (if exceeded)</li>
+<li><strong>Default Value:</strong> 30s</li>
+</ul></li>
+</ol>
+<h3 id="backend-timeouts-when-nginx-talks-to-backends">Backend Timeouts
+(when Nginx talks to backends)</h3>
+<ol type="1">
+<li><p><strong>proxy_connect_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong> <code>proxy_connect_timeout</code>
+specifies the maximum time Nginx waits to establish a connection with a
+backend server.</li>
+<li><strong>Use Case:</strong> In a reverse proxy configuration, it
+helps Nginx quickly identify unresponsive backend servers.</li>
+<li><strong>Benefit:</strong> Ensures that clients are not left waiting
+indefinitely for content from a problematic backend, improving
+reliability.</li>
+<li><strong>Status Code:</strong> 502 Bad Gateway (if exceeded)</li>
+<li><strong>Default Value:</strong> 60s</li>
+</ul></li>
+<li><p><strong>proxy_send_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong> This timeout defines the maximum time
+Nginx waits to send data to the backend server after a connection is
+established.</li>
+<li><strong>Use Case:</strong> In applications like e-commerce
+platforms, where requests are forwarded to backend systems for order
+processing.</li>
+<li><strong>Benefit:</strong> Prevents bottlenecks caused by slow or
+unresponsive backend servers, maintaining responsiveness for clients and
+preventing request queuing or timeouts.</li>
+<li><strong>Status Code:</strong> 502 Bad Gateway (if exceeded)</li>
+<li><strong>Default Value:</strong> 60s</li>
+</ul></li>
+<li><p><strong>proxy_read_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong> Specifies the maximum time Nginx waits
+for a response from the backend server.</li>
+<li><strong>Use Case:</strong> Content-heavy websites fetching data from
+backend databases or applications that rely on various backend
+services.</li>
+<li><strong>Benefit:</strong> Ensures that clients receive timely
+responses, preventing unnecessary delays and potential client-side
+timeouts due to backend issues.</li>
+<li><strong>Status Code:</strong> 504 Gateway Timeout (if exceeded)</li>
+<li><strong>Default Value:</strong> 60s</li>
+</ul></li>
+<li><p><strong>proxy_next_upstream_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong>
+<code>proxy_next_upstream_timeout</code> sets the maximum time Nginx
+waits for a response from the next upstream server in case the current
+one fails.</li>
+<li><strong>Use Case:</strong> In load-balanced configurations, it
+allows Nginx to quickly switch to a backup server if the primary one
+fails to respond.</li>
+<li><strong>Benefit:</strong> Improves fault tolerance and availability
+by minimizing downtime in case of upstream server failures.</li>
+<li><strong>Status Code:</strong> 502 Bad Gateway (if exceeded)</li>
+<li><strong>Default Value:</strong> 0s</li>
+</ul></li>
+<li><p><strong>keepalive_timeout:</strong></p>
+<ul>
+<li><strong>Description:</strong> Already discussed in the frontend
+section, <code>keepalive_timeout</code> also plays a role on the backend
+for reusing connections between Nginx and upstream servers.</li>
+<li><strong>Use Case:</strong> Helps in maintaining efficient and
+persistent connections to backend servers, reducing connection
+overhead.</li>
+<li><strong>Benefit:</strong> Reduces the need to frequently establish
+new connections to upstream servers, improving performance and reducing
+latency.</li>
+<li><strong>Status Code:</strong> Not applicable (connection
+management)</li>
+<li><strong>Default Value:</strong> 75s</li>
+</ul></li>
+</ol>
+<p>Configuring these timeouts accurately based on your specific use
+cases is vital for optimizing the performance, reliability, and
+responsiveness of your Nginx web server or reverse proxy while ensuring
+efficient resource management and graceful handling of client and
+backend server interactions.</p>
+<h2 id="nginx-configuration">Nginx Configuration</h2>
+<p><strong>Understanding Nginx Configuration Contexts:</strong> - Nginx
+configuration is organized into a tree-like structure using curly braces
+<code>{}</code> to define contexts. - Contexts group configuration
+directives based on their area of concern. - Contexts can be nested,
+allowing for inheritance of configurations.</p>
+<p><strong>Core Contexts:</strong></p>
+<ol type="1">
+<li><p><strong>Main Context:</strong></p>
+<ul>
+<li>The top-level context that affects the entire application.</li>
+<li>Configures system user, worker processes, error files, and
+more.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre class="nginx"><code>user www-data;
+worker_processes auto;
+error_log /var/log/nginx/error.log;</code></pre></li>
+<li><p><strong>Events Context:</strong></p>
+<ul>
+<li>Nested within the <code>main</code> context.</li>
+<li>Sets global options for handling connections.</li>
+<li>Controls connection processing techniques.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre class="nginx"><code>events {
+    worker_connections 1024;
+    use epoll;
+}</code></pre></li>
+<li><p><strong>HTTP Context:</strong></p>
+<ul>
+<li>Nested within the <code>main</code> context.</li>
+<li>The primary context for web server configuration.</li>
+<li>Contains directives for handling HTTP or HTTPS connections.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre class="nginx"><code>http {
+    server_names_hash_bucket_size 64;
+    access_log /var/log/nginx/access.log;
+}</code></pre></li>
+<li><p><strong>Server Context:</strong></p>
+<ul>
+<li>Nested within the <code>http</code> context.</li>
+<li>Defines virtual servers for handling specific requests.</li>
+<li>Selects a server based on IP/port and host name.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre class="nginx"><code>server {
+    listen 80;
+    server_name example.com;
+    location / {
+        # Server configuration here
+    }
+}</code></pre></li>
+<li><p><strong>Location Context:</strong></p>
+<ul>
+<li>Nested within server contexts.</li>
+<li>Used to handle requests based on the request URI.</li>
+<li>Contains directives for specific location-based processing.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre class="nginx"><code>location /static/ {
+    alias /var/www/static/;
+}</code></pre></li>
+</ol>
+<p><strong>Other Contexts (Less Common):</strong> -
+<code>split_clients</code>, <code>perl</code>, <code>map</code>,
+<code>geo</code>, <code>types</code>, <code>charset_map</code>: These
+contexts have specific use cases and are used less frequently.</p>
+<p><strong>Upstream Context:</strong> - Used to define and configure
+upstream servers for proxying requests. - Enables load balancing when
+proxying requests.</p>
+<p><strong>Example:</strong>
+<code>nginx    upstream backend {        server backend1.example.com;        server backend2.example.com;    }</code></p>
+<p><strong>If Context:</strong> - Provides conditional processing of
+directives. - Should be used with caution, as it can lead to unexpected
+results. - Typically used with <code>return</code> and
+<code>rewrite</code> directives.</p>
+<p><strong>Example:</strong>
+<code>nginx    if ($request_uri ~* "admin") {        return 403;    }</code></p>
+<p><strong>Limit_except Context:</strong> - Restricts the use of certain
+HTTP methods within a location context. - Useful for controlling access
+to specific methods based on client characteristics.</p>
+<p><strong>Example:</strong>
+<code>nginx    location /restricted-write {        limit_except GET HEAD {            allow 192.168.1.1/24;            deny all;        }    }</code></p>
+<p><strong>General Rules for Contexts:</strong> - Apply directives in
+the highest context available to avoid repetition. - Utilize multiple
+sibling contexts instead of using <code>if</code> logic for processing.
+- Favor purpose-made directives over <code>if</code> for better
+performance and reliability.</p>
 </body>
 </html>
