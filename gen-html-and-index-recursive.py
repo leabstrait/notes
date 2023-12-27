@@ -26,7 +26,7 @@ def convert_html_to_html(directory, entry, title, files_and_folders):
         "pandoc",
         "--citeproc",
         "--metadata",
-        f"title={title}"
+        f"title={title}",
         "--metadata",
         f"subtittle='Notes on {title}'",
         "--metadata",
