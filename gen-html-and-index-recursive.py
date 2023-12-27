@@ -28,8 +28,6 @@ def convert_html_to_html(directory, entry, title, files_and_folders):
         "--metadata",
         f"title={title}",
         "--metadata",
-        f"subtittle='Notes on {title}'",
-        "--metadata",
         f"keywords={', '.join(files_and_folders)}",
         entry,
         "-s",
@@ -122,7 +120,7 @@ def create_index_html(directory):
 
     # Generate the content for index.html
     title = " ".join(os.path.basename(directory).split('-')).capitalize()
-    content = f"<h1>{title}</h1>\n\n"
+    content = ""
     for item in files_and_folders:
         if item.endswith(".tex"):
             item_link = f"{item.replace('.tex', '.html')}"
