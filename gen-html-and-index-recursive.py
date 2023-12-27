@@ -131,7 +131,7 @@ def create_index_html(directory):
     )
     with open(index_path, "w") as index_file:
         index_file.write(content)
-        convert_html_to_html(directory, index_file)
+        convert_html_to_html(directory, 'index.html')
 
     return True
 
