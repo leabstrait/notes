@@ -125,6 +125,14 @@ def create_index_html(directory):
         item_link = f"{item}/"
         content += f"<li><a href='{item_link}'>{item}</a></li>\n"
 
+    content = f'''
+    ---
+    title: {str(os.path.basename(directory)).capitalize()}
+    subtitle: Notes on {str(os.path.basename(directory)).capitalize()}
+    keywords: {", ".join(files_and_folders)}
+    ---
+    ''' + content
+
     # Write the content to index.html
     index_path = os.path.abspath(
         os.path.join("docs", os.path.relpath(directory, os.getcwd()), "index.html")
