@@ -108,7 +108,8 @@ def create_index_html(directory):
     files_and_folders.sort()
 
     # Generate the content for index.html
-    content = f"<h1>{os.path.basename(directory)}</h1>\n\n"
+    title = " ".join(os.path.basename(directory).split('-')).capitalize()
+    content = f"<h1>{title}</h1>\n\n"
     for item in files_and_folders:
         if item.endswith(".tex"):
             item_link = f"{item.replace('.tex', '.html')}"
@@ -126,11 +127,11 @@ def create_index_html(directory):
         content += f"<li><a href='{item_link}'>{item}</a></li>\n"
 
     content = f'''
-    ---
-    title: {str(os.path.basename(directory)).capitalize()}
-    subtitle: Notes on {str(os.path.basename(directory)).capitalize()}
-    keywords: {", ".join(files_and_folders)}
-    ---
+    ---\n
+    title: {title}\n
+    subtitle: Notes on {title}\n
+    keywords: {", ".join(files_and_folders)}\n
+    ---\n
     ''' + content
 
     # Write the content to index.html
