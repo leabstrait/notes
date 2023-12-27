@@ -1,11 +1,7 @@
 ---
 title: Bookmarks
-subtitle:
-author: Labin Ojha
 keywords:
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
-fontsize: 11.5pt
-mainfont: Arial, Palatino, Georgia, Times
 ---
 
 -   [Sematic Versioning - a popular versioning scheme](https://semver.org/)

@@ -1,11 +1,7 @@
 ---
 title: Rename All Files Folders Specified Pattern
-subtitle:
-author: Labin Ojha
 keywords:
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
-fontsize: 11.5pt
-mainfont: Arial, Palatino, Georgia, Times
 ---
 
 ```bash

@@ -1,11 +1,7 @@
 ---
 title: Mathematics Notes
-subtitle:
-author: Labin Ojha
 keywords:
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
-fontsize: 11.5pt
-mainfont: Arial, Palatino, Georgia, Times
 ---
 
 Notes from [Mathematics for Engineers Specialization](https://www.math.hkust.edu.hk/~machas/) in Coursera

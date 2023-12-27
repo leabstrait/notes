@@ -1,11 +1,7 @@
 ---
 title: Threads And Connections In The Backend
-subtitle:
-author: Labin Ojha
 keywords:
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
-fontsize: 11.5pt
-mainfont: Arial, Palatino, Georgia, Times
 ---
 
 From [Threads and Connections in Backend Applications](https://medium.com/@hnasr/threads-and-connections-in-backend-applications-a225eed3eddb)
