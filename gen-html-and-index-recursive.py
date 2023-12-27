@@ -17,12 +17,12 @@ def convert_tex_to_html(directory, entry):
     subprocess.run(command, cwd=directory, check=True)
 
 def convert_html_to_html(directory, entry):
-    output_filename = entry
-    output_path = os.path.abspath(
-        os.path.join("docs", os.path.relpath(directory, os.getcwd()), output_filename)
-    )
-    print(output_path)
-    command = ["pandoc", "--citeproc", entry, "-s", "-o", output_path]
+    # output_filename = entry
+    # output_path = os.path.abspath(
+    #     os.path.join("docs", os.path.relpath(directory, os.getcwd()), output_filename)
+    # )
+    # print(output_path)
+    command = ["pandoc", "--citeproc", entry, "-s", "-o", entry]
     # change working directory to the one containing the source tex files so that all relative references
     # work, and also so that we don't need to construct absolute paths of the documents we are processing
     # the output path will still be an absolute path
@@ -131,7 +131,7 @@ def create_index_html(directory):
     )
     with open(index_path, "w") as index_file:
         index_file.write(content)
-        convert_html_to_html(directory, 'index.html')
+    convert_html_to_html(directory, index_path)
 
     return True
 
