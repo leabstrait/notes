@@ -124,18 +124,18 @@ def create_index_html(directory):
     for item in files_and_folders:
         if item.endswith(".tex"):
             item_link = f"{item.replace('.tex', '.html')}"
-            content += f"<li> <a href='{item_link}'>{item.replace('.tex', '')}</a> <a href='{item.replace('.tex', '.pdf')}'>PDF 🗎</a></li>\n"
+            content += f"<p> <a href='{item_link}'>{item.replace('.tex', '')}</a> <a href='{item.replace('.tex', '.pdf')}'>PDF 🗎</a></p>\n"
             continue
 
         if item.endswith(".md"):
             item_link = f"{item.replace('.md', '.html')}"
             content += (
-                f"<li> <a href='{item_link}'>{item.replace('.md', '')}</a> </li>\n"
+                f"<p> <a href='{item_link}'>{item.replace('.md', '')}</a> </p>\n"
             )
             continue
 
         item_link = f"{item}/"
-        content += f"<li><a href='{item_link}'>{item}</a></li>\n"
+        content += f"<p><a href='{item_link}'>{item}</a></p>\n"
 
     # Write the content to index.html
     index_path = os.path.abspath(
