@@ -25,8 +25,16 @@ def convert_html_to_html(directory, entry, title, files_and_folders):
     command = [
         "pandoc",
         "--citeproc",
-        f"--metadata title={title} --metadata subtittle='Notes on {title}' --metadata keywords={', '.join(files_and_folders)}",
-        entry, "-s", "-o", entry
+        "--metadata",
+        f"title={title}"
+        "--metadata",
+        f"subtittle='Notes on {title}'",
+        "--metadata",
+        f"keywords={', '.join(files_and_folders)}",
+        entry,
+        "-s",
+        "-o",
+        entry
     ]
     # change working directory to the one containing the source tex files so that all relative references
     # work, and also so that we don't need to construct absolute paths of the documents we are processing
