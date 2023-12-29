@@ -16,7 +16,6 @@ def convert_tex_to_html(directory, entry):
     # the output path will still be an absolute path
     subprocess.run(command, cwd=directory, check=True)
 
-
 def convert_html_to_html(directory, entry, title, files_and_folders):
     # output_filename = entry
     # output_path = os.path.abspath(
@@ -33,13 +32,12 @@ def convert_html_to_html(directory, entry, title, files_and_folders):
         entry,
         "-s",
         "-o",
-        entry,
+        entry
     ]
     # change working directory to the one containing the source tex files so that all relative references
     # work, and also so that we don't need to construct absolute paths of the documents we are processing
     # the output path will still be an absolute path
     subprocess.run(command, cwd=directory, check=True)
-
 
 def convert_md_to_html(directory, entry):
     output_filename = entry.replace(".md", ".html")
@@ -121,17 +119,19 @@ def create_index_html(directory):
     files_and_folders.sort()
 
     # Generate the content for index.html
-    title = " ".join(os.path.basename(directory).split("-")).capitalize()
+    title = " ".join(os.path.basename(directory).split('-')).capitalize()
     content = ""
     for item in files_and_folders:
         if item.endswith(".tex"):
             item_link = f"{item.replace('.tex', '.html')}"
-            content += f"<p> <a href='{item_link}'>{title}</a> <a href='{item.replace('.tex', '.pdf')}'>PDF 🗎</a></p>\n"
+            content += f"<p> <a href='{item_link}'>{item.replace('.tex', '')}</a> <a href='{item.replace('.tex', '.pdf')}'>PDF 🗎</a></p>\n"
             continue
 
         if item.endswith(".md"):
             item_link = f"{item.replace('.md', '.html')}"
-            content += f"<p> <a href='{item_link}'>{title}</a> </p>\n"
+            content += (
+                f"<p> <a href='{item_link}'>{item.replace('.md', '')}</a> </p>\n"
+            )
             continue
 
         item_link = f"{item}/"
