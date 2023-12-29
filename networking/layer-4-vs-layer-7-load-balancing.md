@@ -3,9 +3,6 @@ title: Layer 4 Vs Layer 7 Load Balancing
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
 ---
 
-# Layer 4 Vs Layer 7 Load Balancing
-
----
 
 ## **Layer 4 Load Balancer:**
 

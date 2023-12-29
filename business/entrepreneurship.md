@@ -1,5 +1,3 @@
-# Entrepreneurship
-
 [How Money Works - America's Dangerous Obsession with Entrepreneurship][yt-hmw-31-07-2023]
 
 > The best way to start a business is to work in an industry you are interested in, get paid to learn about that industry, find a problem and leave to solve that problem.
