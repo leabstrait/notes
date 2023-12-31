@@ -243,18 +243,29 @@
 <ul>
 <li>A perceptron is a fundamental unit in artificial neural networks
 (ANNs), acting as a simple mathematical function.</li>
-<li>Denoted as (k), it processes (m + 1) inputs ((x_0) to (x_m)) with
-corresponding weights ((w_{k0}) to (w_{km})).</li>
-<li>The (x_0) input serves as a bias input with (w_{k0} = b_k),
+<li>Denoted as <span class="math inline"><em>k</em></span>, it processes
+<span class="math inline"><em>m</em> + 1</span> inputs (<span
+class="math inline"><em>x</em><sub>0</sub></span> to <span
+class="math inline"><em>x</em><sub><em>m</em></sub></span>) with
+corresponding weights (<span
+class="math inline"><em>w</em><sub><em>k</em>0</sub></span> to <span
+class="math inline"><em>w</em><sub><em>k</em><em>m</em></sub></span>).</li>
+<li>The <span class="math inline"><em>x</em><sub>0</sub></span> input
+serves as a bias input with <span
+class="math inline"><em>w</em><sub><em>k</em>0</sub> = <em>b</em><sub><em>k</em></sub></span>,
 simplifying the representation.</li>
 </ul>
 <h3 id="perceptron-output">Perceptron Output:</h3>
 <ul>
-<li>The output ((y_k)) of the (k)-th neuron is determined by the
-transfer function ().</li>
-<li>Mathematically, (y_k = (<em>{j=0}^{m} w</em>{kj}x_j)).</li>
-<li>The transfer function (()) introduces non-linearity, allowing neural
-networks to learn complex patterns.</li>
+<li>The output (<span
+class="math inline"><em>y</em><sub><em>k</em></sub></span>) of the <span
+class="math inline"><em>k</em></span>-th neuron is determined by the
+transfer function <span class="math inline"><em>φ</em></span>.</li>
+<li>Mathematically, <span class="math inline">$y_k =
+\varphi\left(\sum_{j=0}^{m} w_{kj}x_j\right)$</span>.</li>
+<li>The transfer function <span class="math inline"><em>φ</em></span>
+introduces non-linearity, allowing neural networks to learn complex
+patterns.</li>
 </ul>
 <h3 id="neural-network-structure">Neural Network Structure:</h3>
 <ul>
@@ -280,17 +291,20 @@ in weights.</li>
 layer.</li>
 <li>Weighted sums of inputs are computed at each neuron, and the
 transfer function is applied.</li>
-<li>Mathematically, (z_k = <em>{j=0}^{m} w</em>{kj}x_j), and (y_k =
-(z_k)).</li>
+<li>Mathematically, <span class="math inline">$z_k = \sum_{j=0}^{m}
+w_{kj}x_j$</span>, and <span
+class="math inline"><em>y</em><sub><em>k</em></sub> = <em>φ</em>(<em>z</em><sub><em>k</em></sub>)</span>.</li>
 </ul></li>
 <li><strong>Output Activation:</strong>
 <ul>
 <li>Activation functions introduce non-linearity to the output
 layer.</li>
-<li>Common activation functions include sigmoid (()), tanh, and
-ReLU.</li>
-<li>Mathematically, (a_k = (z_k)), where (a_k) is the activated
-output.</li>
+<li>Common activation functions include sigmoid (<span
+class="math inline"><em>σ</em></span>), tanh, and ReLU.</li>
+<li>Mathematically, <span
+class="math inline"><em>a</em><sub><em>k</em></sub> = <em>φ</em>(<em>z</em><sub><em>k</em></sub>)</span>,
+where <span class="math inline"><em>a</em><sub><em>k</em></sub></span>
+is the activated output.</li>
 </ul></li>
 <li><strong>Loss Calculation:</strong>
 <ul>
@@ -298,8 +312,9 @@ output.</li>
 function.</li>
 <li>The loss quantifies the disparity between predictions and ground
 truth.</li>
-<li>For example, Mean Squared Error (MSE) is often used: (L = (a_k -
-y_{})^2).</li>
+<li>For example, Mean Squared Error (MSE) is often used: <span
+class="math inline">$L = \frac{1}{2}(a_k -
+y_{\text{true}})^2$</span>.</li>
 </ul></li>
 <li><strong>Backward Propagation and Weight Update:</strong>
 <ul>
@@ -307,8 +322,13 @@ y_{})^2).</li>
 backpropagation.</li>
 <li>Weights are updated using gradient descent to minimize the
 loss.</li>
-<li>Mathematically, ( = ).</li>
-<li>Update rule: (w_{kj} w_{kj} - ), where () is the learning rate.</li>
+<li>Mathematically, <span class="math inline">$\frac{\partial
+L}{\partial w_{kj}} = \frac{\partial L}{\partial a_k} \cdot
+\frac{\partial a_k}{\partial z_k} \cdot \frac{\partial z_k}{\partial
+w_{kj}}$</span>.</li>
+<li>Update rule: <span class="math inline">$w_{kj} \leftarrow w_{kj} -
+\alpha \frac{\partial L}{\partial w_{kj}}$</span>, where <span
+class="math inline"><em>α</em></span> is the learning rate.</li>
 </ul></li>
 </ol>
 <div class="sourceCode" id="cb1"><pre
