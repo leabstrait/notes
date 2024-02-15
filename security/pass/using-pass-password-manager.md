@@ -1,7 +1,6 @@
 ---
 title: Pass Cheatsheet
 keywords:
-bibliography:
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
 ---
 

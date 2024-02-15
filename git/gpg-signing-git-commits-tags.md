@@ -1,7 +1,6 @@
 ---
 title: GPG Signing git Commits Tags
 keywords:
-bibliography:
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
 ---
 
