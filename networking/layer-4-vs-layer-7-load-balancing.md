@@ -1,8 +1,4 @@
----
-title: Layer 4 Vs Layer 7 Load Balancing
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
-
+# Layer 4 Vs Layer 7 Load Balancing
 
 ## **Layer 4 Load Balancer:**
 
@@ -23,8 +19,6 @@ A Layer 4 Load Balancer operates at the transport layer (TCP/UDP) and focuses on
 -   **Sticky Connections:** A client's connection remains tied to a specific server for its duration.
 -   **No Caching:** Due to its lack of content awareness, caching is not feasible.
 -   **Protocol Agnostic:** Can't make smart decisions based on content or protocols.
-
----
 
 ## **Layer 7 Load Balancer:**
 

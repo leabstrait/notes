@@ -1,10 +1,7 @@
----
-title: Test Merge
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
-
+# Test Merge
 
 We can use `git merge --no-commit` to prevent the merge from actually being committed, and if we don't like how the merge works out, just reset to the original head. If you definitely don't want to finalize the merge, even if it's a fast-forward (and thus has no conflicts, by definition), you could add `--no-ff` as well.
+
 -   `git config --global alias.merge-test '!f() { git merge --no-commit --no-ff "$@"; echo "Run \"git merge --abort\" if you don'\''t want to commit the changes"; }; f'`
 
 To be more safe, we can do the following:

@@ -1,8 +1,4 @@
----
-title: Threads And Connections In The Backend
-keywords:
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
+# Threads And Connections In The Backend
 
 From [Threads and Connections in Backend Applications](https://medium.com/@hnasr/threads-and-connections-in-backend-applications-a225eed3eddb)
 

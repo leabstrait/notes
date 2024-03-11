@@ -1,8 +1,4 @@
----
-title: Bookmarks
-keywords:
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
+# Bookmarks
 
 -   [AI Expert Roadmap - a set of charts demonstrating the paths that you can take and the technologies that you would want to adopt in order to become a data scientist, machine learning or an AI expert](https://i.am.ai/roadmap)
 

@@ -1,8 +1,4 @@
----
-title: Bookmarks
-keywords:
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
+# Bookmarks
 
 -   [Sematic Versioning - a popular versioning scheme](https://semver.org/)
 

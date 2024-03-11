@@ -1,8 +1,4 @@
----
-title: Rename All Files Folders Specified Pattern
-keywords:
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
+# Rename All Files Folders Specified Pattern
 
 ```bash
 find . -depth -name '*_*' -execdir bash -c 'for f; do mv "$f" "${f//_/-}"; done' bash {} +

@@ -1,7 +1,4 @@
----
-title: "Proxy vs Reverse Proxy"
-bibliography: "../references.bib"
----
+# "Proxy vs Reverse Proxy"
 
 # Proxy Server
 

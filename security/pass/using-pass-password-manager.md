@@ -1,8 +1,4 @@
----
-title: Pass Cheatsheet
-keywords:
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
+# Pass Cheatsheet
 
 ### `pass` Password Manager Cheatsheet
 

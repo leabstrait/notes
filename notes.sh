@@ -40,13 +40,7 @@ notes() {
 
         # Metadata
         cat <<EOF >"$note_path"
----
-title: $title_case
-keywords:
-bibliography:
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
-
+# $title_case
 
 EOF
 

@@ -1,8 +1,4 @@
----
-title: GPG Quickstart
-keywords:
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
+# GPG Quickstart
 
 ## GPG (GNU Privacy Guard) Quick Start
 
@@ -106,7 +102,8 @@ csl: https://raw.githubusercontent.com/citation-style-language/styles/master/iee
     ```
 
 -   #### Removing a key from the secret keyring
-     !! UNSAFE, BE CAREFUL !!
+
+    !! UNSAFE, BE CAREFUL !!
 
     ```bash
     gpg --delete-secret-keys user@example.com

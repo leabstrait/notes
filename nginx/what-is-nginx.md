@@ -1,8 +1,4 @@
----
-title: What Is Nginx
-keywords:
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
+# What Is Nginx
 
 ## Nginx Usecases
 
@@ -204,119 +200,138 @@ Configuring these timeouts accurately based on your specific use cases is vital 
 ## Nginx Configuration
 
 **Understanding Nginx Configuration Contexts:**
-- Nginx configuration is organized into a tree-like structure using curly braces `{}` to define contexts.
-- Contexts group configuration directives based on their area of concern.
-- Contexts can be nested, allowing for inheritance of configurations.
+
+-   Nginx configuration is organized into a tree-like structure using curly braces `{}` to define contexts.
+-   Contexts group configuration directives based on their area of concern.
+-   Contexts can be nested, allowing for inheritance of configurations.
 
 **Core Contexts:**
 
 1. **Main Context:**
-   - The top-level context that affects the entire application.
-   - Configures system user, worker processes, error files, and more.
 
-   **Example:**
-   ```nginx
-   user www-data;
-   worker_processes auto;
-   error_log /var/log/nginx/error.log;
-   ```
+    - The top-level context that affects the entire application.
+    - Configures system user, worker processes, error files, and more.
+
+    **Example:**
+
+    ```nginx
+    user www-data;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log;
+    ```
 
 2. **Events Context:**
-   - Nested within the `main` context.
-   - Sets global options for handling connections.
-   - Controls connection processing techniques.
 
-   **Example:**
-   ```nginx
-   events {
-       worker_connections 1024;
-       use epoll;
-   }
-   ```
+    - Nested within the `main` context.
+    - Sets global options for handling connections.
+    - Controls connection processing techniques.
+
+    **Example:**
+
+    ```nginx
+    events {
+        worker_connections 1024;
+        use epoll;
+    }
+    ```
 
 3. **HTTP Context:**
-   - Nested within the `main` context.
-   - The primary context for web server configuration.
-   - Contains directives for handling HTTP or HTTPS connections.
 
-   **Example:**
-   ```nginx
-   http {
-       server_names_hash_bucket_size 64;
-       access_log /var/log/nginx/access.log;
-   }
-   ```
+    - Nested within the `main` context.
+    - The primary context for web server configuration.
+    - Contains directives for handling HTTP or HTTPS connections.
+
+    **Example:**
+
+    ```nginx
+    http {
+        server_names_hash_bucket_size 64;
+        access_log /var/log/nginx/access.log;
+    }
+    ```
 
 4. **Server Context:**
-   - Nested within the `http` context.
-   - Defines virtual servers for handling specific requests.
-   - Selects a server based on IP/port and host name.
 
-   **Example:**
-   ```nginx
-   server {
-       listen 80;
-       server_name example.com;
-       location / {
-           # Server configuration here
-       }
-   }
-   ```
+    - Nested within the `http` context.
+    - Defines virtual servers for handling specific requests.
+    - Selects a server based on IP/port and host name.
+
+    **Example:**
+
+    ```nginx
+    server {
+        listen 80;
+        server_name example.com;
+        location / {
+            # Server configuration here
+        }
+    }
+    ```
 
 5. **Location Context:**
-   - Nested within server contexts.
-   - Used to handle requests based on the request URI.
-   - Contains directives for specific location-based processing.
 
-   **Example:**
-   ```nginx
-   location /static/ {
-       alias /var/www/static/;
-   }
-   ```
+    - Nested within server contexts.
+    - Used to handle requests based on the request URI.
+    - Contains directives for specific location-based processing.
+
+    **Example:**
+
+    ```nginx
+    location /static/ {
+        alias /var/www/static/;
+    }
+    ```
 
 **Other Contexts (Less Common):**
-- `split_clients`, `perl`, `map`, `geo`, `types`, `charset_map`: These contexts have specific use cases and are used less frequently.
+
+-   `split_clients`, `perl`, `map`, `geo`, `types`, `charset_map`: These contexts have specific use cases and are used less frequently.
 
 **Upstream Context:**
-- Used to define and configure upstream servers for proxying requests.
-- Enables load balancing when proxying requests.
 
-   **Example:**
-   ```nginx
-   upstream backend {
-       server backend1.example.com;
-       server backend2.example.com;
-   }
-   ```
+-   Used to define and configure upstream servers for proxying requests.
+-   Enables load balancing when proxying requests.
+
+    **Example:**
+
+    ```nginx
+    upstream backend {
+        server backend1.example.com;
+        server backend2.example.com;
+    }
+    ```
 
 **If Context:**
-- Provides conditional processing of directives.
-- Should be used with caution, as it can lead to unexpected results.
-- Typically used with `return` and `rewrite` directives.
 
-   **Example:**
-   ```nginx
-   if ($request_uri ~* "admin") {
-       return 403;
-   }
-   ```
+-   Provides conditional processing of directives.
+-   Should be used with caution, as it can lead to unexpected results.
+-   Typically used with `return` and `rewrite` directives.
+
+    **Example:**
+
+    ```nginx
+    if ($request_uri ~* "admin") {
+        return 403;
+    }
+    ```
 
 **Limit_except Context:**
-- Restricts the use of certain HTTP methods within a location context.
-- Useful for controlling access to specific methods based on client characteristics.
 
-   **Example:**
-   ```nginx
-   location /restricted-write {
-       limit_except GET HEAD {
-           allow 192.168.1.1/24;
-           deny all;
-       }
-   }
-   ```
+-   Restricts the use of certain HTTP methods within a location context.
+-   Useful for controlling access to specific methods based on client characteristics.
+
+    **Example:**
+
+    ```nginx
+    location /restricted-write {
+        limit_except GET HEAD {
+            allow 192.168.1.1/24;
+            deny all;
+        }
+    }
+    ```
 
 **General Rules for Contexts:**
-- Apply directives in the highest context available to avoid repetition.
-- Utilize multiple sibling contexts instead of using `if` logic for processing.
-- Favor purpose-made directives over `if` for better performance and reliability.
+
+-   Apply directives in the highest context available to avoid repetition.
+-   Utilize multiple sibling contexts instead of using `if` logic for processing.
+-   Favor purpose-made directives over `if` for better performance and reliability.

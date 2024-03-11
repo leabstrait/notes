@@ -1,8 +1,4 @@
----
-title: GPG Signing git Commits Tags
-keywords:
-csl: https://raw.githubusercontent.com/citation-style-language/styles/master/ieee.csl
----
+# GPG Signing git Commits Tags
 
 ### Signing and Verifying git Commits on the Command Line and GitHub
 

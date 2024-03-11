@@ -1,7 +1,4 @@
----
-title: "Networking Concepts"
-bibliography: "../references.bib"
----
+# "Networking Concepts"
 
 ## Slides
 

@@ -1,6 +1,4 @@
----
-title:The Listening Server (Understanding what to listen on)
----
+# The Listening Server (Understanding what to listen on)
 
 -   You create a server by listening on a port on a specific ip address
 -   Your machine might have multiple interfaces with multiple IP address
@@ -18,10 +16,10 @@ title:The Listening Server (Understanding what to listen on)
 -   OS creates a hash source ip/source port/dest ip/ dest port
 -   Guarantees always go to the same process if the pair match
 
-
 One common mistake that backend engineers make is expose their database instance at every possible connection.
 
 Example pg_hba.conf Entries ([Client Authentication](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html))
+
 ```
 # Allow any user on the local system to connect to any database with
 # any database user name using Unix-domain sockets (the default for local
@@ -114,4 +112,5 @@ local   all             @admins,+support                        md5
 # The database column can also use lists and file names:
 local   db1,db2,@demodbs  all                                   md5
 ```
+
 See also: [Server Configuration for Connections and Authentication](https://www.postgresql.org/docs/current/runtime-config-connection.html)

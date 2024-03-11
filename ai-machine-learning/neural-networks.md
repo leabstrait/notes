@@ -1,52 +1,55 @@
----
-title: Neural Networks
----
+# Neural Networks
 
 ![A Neural Network](neural-networks/neural-network.png)
 
-
 ### Perceptron:
-- A perceptron is a fundamental unit in artificial neural networks (ANNs), acting as a simple mathematical function.
-- Denoted as $k$, it processes $m + 1$ inputs ($x_0$ to $x_m$) with corresponding weights ($w_{k0}$ to $w_{km}$).
-- The $x_0$ input serves as a bias input with $w_{k0} = b_k$, simplifying the representation.
+
+-   A perceptron is a fundamental unit in artificial neural networks (ANNs), acting as a simple mathematical function.
+-   Denoted as $k$, it processes $m + 1$ inputs ($x_0$ to $x_m$) with corresponding weights ($w_{k0}$ to $w_{km}$).
+-   The $x_0$ input serves as a bias input with $w_{k0} = b_k$, simplifying the representation.
 
 ### Perceptron Output:
-- The output ($y_k$) of the $k$-th neuron is determined by the transfer function $\varphi$.
-- Mathematically, $y_k = \varphi\left(\sum_{j=0}^{m} w_{kj}x_j\right)$.
-- The transfer function $\varphi$ introduces non-linearity, allowing neural networks to learn complex patterns.
+
+-   The output ($y_k$) of the $k$-th neuron is determined by the transfer function $\varphi$.
+-   Mathematically, $y_k = \varphi\left(\sum_{j=0}^{m} w_{kj}x_j\right)$.
+-   The transfer function $\varphi$ introduces non-linearity, allowing neural networks to learn complex patterns.
 
 ### Neural Network Structure:
-- Neural networks consist of layers: an input layer, hidden layers, and an output layer.
-- The input layer receives initial data, hidden layers process information, and the output layer produces predictions.
-- Neurons in each layer are interconnected with weights, which are adjusted during the learning process.
+
+-   Neural networks consist of layers: an input layer, hidden layers, and an output layer.
+-   The input layer receives initial data, hidden layers process information, and the output layer produces predictions.
+-   Neurons in each layer are interconnected with weights, which are adjusted during the learning process.
 
 ### Learning Process:
 
 1. **Weights and Gradients Initialization:**
-   - Initialize weights appropriately; improper initialization may lead to slow convergence or convergence to suboptimal solutions.
-   - Gradients represent the sensitivity of the loss function to changes in weights.
+
+    - Initialize weights appropriately; improper initialization may lead to slow convergence or convergence to suboptimal solutions.
+    - Gradients represent the sensitivity of the loss function to changes in weights.
 
 2. **Forward Propagation:**
-   - Inputs are fed forward through the network, reaching the output layer.
-   - Weighted sums of inputs are computed at each neuron, and the transfer function is applied.
-   - Mathematically, $z_k = \sum_{j=0}^{m} w_{kj}x_j$, and $y_k = \varphi(z_k)$.
+
+    - Inputs are fed forward through the network, reaching the output layer.
+    - Weighted sums of inputs are computed at each neuron, and the transfer function is applied.
+    - Mathematically, $z_k = \sum_{j=0}^{m} w_{kj}x_j$, and $y_k = \varphi(z_k)$.
 
 3. **Output Activation:**
-   - Activation functions introduce non-linearity to the output layer.
-   - Common activation functions include sigmoid ($\sigma$), tanh, and ReLU.
-   - Mathematically, $a_k = \varphi(z_k)$, where $a_k$ is the activated output.
+
+    - Activation functions introduce non-linearity to the output layer.
+    - Common activation functions include sigmoid ($\sigma$), tanh, and ReLU.
+    - Mathematically, $a_k = \varphi(z_k)$, where $a_k$ is the activated output.
 
 4. **Loss Calculation:**
-   - Compare the predicted output to the actual output using a loss function.
-   - The loss quantifies the disparity between predictions and ground truth.
-   - For example, Mean Squared Error (MSE) is often used: $L = \frac{1}{2}(a_k - y_{\text{true}})^2$.
+
+    - Compare the predicted output to the actual output using a loss function.
+    - The loss quantifies the disparity between predictions and ground truth.
+    - For example, Mean Squared Error (MSE) is often used: $L = \frac{1}{2}(a_k - y_{\text{true}})^2$.
 
 5. **Backward Propagation and Weight Update:**
-   - Gradients are calculated using the chain rule during backpropagation.
-   - Weights are updated using gradient descent to minimize the loss.
-   - Mathematically, $\frac{\partial L}{\partial w_{kj}} = \frac{\partial L}{\partial a_k} \cdot \frac{\partial a_k}{\partial z_k} \cdot \frac{\partial z_k}{\partial w_{kj}}$.
-   - Update rule: $w_{kj} \leftarrow w_{kj} - \alpha \frac{\partial L}{\partial w_{kj}}$, where $\alpha$ is the learning rate.
-
+    - Gradients are calculated using the chain rule during backpropagation.
+    - Weights are updated using gradient descent to minimize the loss.
+    - Mathematically, $\frac{\partial L}{\partial w_{kj}} = \frac{\partial L}{\partial a_k} \cdot \frac{\partial a_k}{\partial z_k} \cdot \frac{\partial z_k}{\partial w_{kj}}$.
+    - Update rule: $w_{kj} \leftarrow w_{kj} - \alpha \frac{\partial L}{\partial w_{kj}}$, where $\alpha$ is the learning rate.
 
 ```python
 import numpy as np
