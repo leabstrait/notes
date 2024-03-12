@@ -13,12 +13,8 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
+        run: |
+          git clone --depth=1 --branch=main https://github.com/${{ github.repository }} ./
 
       - name: Generate README
         run: python gen_readme.py
