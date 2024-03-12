@@ -9,6 +9,8 @@ jobs:
   generate_and_commit_readme:
     name: Generate and Commit README
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
