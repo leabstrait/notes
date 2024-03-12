@@ -9,19 +9,18 @@ jobs:
   generate_and_commit_readme:
     name: Generate and Commit README
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
     steps:
       - name: Checkout code
-        run: git clone --depth=1 --branch=main https://github.com/${{ github.repository }} ./
+        uses: actions/checkout
 
       - name: Generate README
         run: python gen_readme.py
 
       - name: Commit README changes
         run: |
-          git config --local user.email "leabstrait@gmail.com"
-          git config --local user.name "Labin Ojha"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git add README.md
           git commit -m "Automatically generated README"
           git push
