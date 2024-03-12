@@ -28,7 +28,7 @@ def traverse(enter_dir, skip_list=None):
             traverse(item_path, skip_list)
         elif item.endswith(".md"):
             relative_path = os.path.relpath(item_path, root_dir)
-            readme_content += f"  - [{item.replace('.md', '')}]({relative_path.replace('.md', '')})\n"
+            readme_content += f"  - [{item.replace('.md', '')}]({relative_path})\n"
 
 # Call the traverse function to update readme_content
 traverse(root_dir, skip_list=[".git", "CNAME", "gen_readme.py", "notes.sh"])
