@@ -1,0 +1,31 @@
+name: Generate and Commit README
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate_and_commit_readme:
+    name: Generate and Commit README
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Generate README
+        run: python generate_readme.py
+
+      - name: Commit README changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git commit -m "Automatically generated README"
+          git push
