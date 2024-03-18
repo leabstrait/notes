@@ -2,7 +2,7 @@ import os
 
 root_dir = os.getcwd()
 readme_path = os.path.join(root_dir, "README.md")
-readme_content = "# Notes\n\n"
+readme_content = ""
 
 def contains_md_files(enter_dir):
     """Check if the directory contains Markdown files."""
@@ -18,7 +18,7 @@ def contains_md_files(enter_dir):
 def traverse(enter_dir, skip_list=None):
     """Traverse the directory tree and add Markdown files to the README."""
     global readme_content
-    for item in os.listdir(enter_dir):
+    for item in sorted(os.listdir(enter_dir)):
         if skip_list and item in skip_list:
             continue
         item_path = os.path.join(enter_dir, item)
@@ -31,7 +31,7 @@ def traverse(enter_dir, skip_list=None):
             readme_content += f"  - [{item.replace('.md', '')}]({relative_path})\n"
 
 # Call the traverse function to update readme_content
-traverse(root_dir, skip_list=[".git", "CNAME", "gen_readme.py", "notes.sh"])
+traverse(root_dir, skip_list=[".git", "CNAME", "gen_readme.py", "README.md"])
 
 # Write the content to README.md
 with open(readme_path, "w") as readme_file:
