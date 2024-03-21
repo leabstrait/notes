@@ -2,7 +2,7 @@ import os
 
 root_dir = os.getcwd()
 readme_path = os.path.join(root_dir, "README.md")
-readme_content = ""
+readme_content = "---"
 
 def contains_md_files(enter_dir):
     """Check if the directory contains Markdown files."""
