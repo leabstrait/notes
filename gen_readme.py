@@ -2,7 +2,7 @@ import os
 
 root_dir = os.getcwd()
 readme_path = os.path.join(root_dir, "README.md")
-readme_content = "# Notes\n\n"
+readme_content = ""
 
 def contains_md_files(enter_dir):
     """Check if the directory contains Markdown files."""
@@ -24,7 +24,7 @@ def traverse(enter_dir, skip_list=None):
         item_path = os.path.join(enter_dir, item)
         if os.path.isdir(item_path):
             if contains_md_files(item_path):
-                readme_content += f"\n## {item}\n"
+                readme_content += f"\n### {item}\n"
             traverse(item_path, skip_list)
         elif item.endswith(".md"):
             relative_path = os.path.relpath(item_path, root_dir)
