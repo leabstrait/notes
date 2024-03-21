@@ -19,7 +19,12 @@ jobs:
       - name: Generate README
         run: python gen_readme.py
 
+      - name: Check for changes
+        id: check_changes
+        run: echo "::set-output name=changes::$(git status --porcelain README.md)"
+
       - name: Commit README changes
+        if: steps.check_changes.outputs.changes != ''
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
