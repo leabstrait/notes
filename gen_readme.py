@@ -31,7 +31,7 @@ def traverse(enter_dir, skip_list=None):
             readme_content += f"  - [{item.replace('.md', '')}]({relative_path})\n"
 
 # Call the traverse function to update readme_content
-traverse(root_dir, skip_list=[".git", "CNAME", "gen_readme.py", "README.md"])
+traverse(root_dir, skip_list=[".git", "CNAME", "gen_readme.py", "README.md", "docs"])
 
 # Write the content to README.md
 with open(readme_path, "w") as readme_file:
