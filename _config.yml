@@ -4,8 +4,6 @@
 title: Notes
 description: Notes and References
 url: https://notes.labinojha.com.np # Base URL for your GitHub Pages site
-header_pages: [""]
 
 # GitHub Pages specific settings
-theme: minima
-markdown: kramdown # Markdown parser to use
+theme: minimal
