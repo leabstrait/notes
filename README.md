@@ -20,6 +20,7 @@
   - [test-merge](git/test-merge.md)
 
 ### mathematics
+  - [engineering-mathematics](mathematics/engineering-mathematics.md)
   - [mathematics-notes](mathematics/mathematics-notes.md)
 
 ### networking
