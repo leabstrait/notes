@@ -23,6 +23,7 @@ The rate of change of $x$ in time: $\dot x$ is linearly proportional to $x$, the
 $\dot X = A X$
 
 Instead of just one variable $x$, we keep track of lots of variables (usually in a matrix) $X$. $A$ is a matrix that tells how the system changes with time as a linear function of that system.
+
 **Example:** Consider a system of ODEs representing predator-prey dynamics, known as the Lotka-Volterra equations:
 
 $\dot{x} = \alpha x - \beta xy$
@@ -35,7 +36,7 @@ Where $x$ represents the prey population (e.g., rabbits) and $y$ represents the 
 
 $AT = TD$
 
-The eigenvalues and eigenvectors(co-ordinate transformations) of the $A$ matrix are useful in solving the system of ODEs. they describe how systems behave under linear transformations.
+The eigenvalues and eigenvectors(coordinate transformations) of the $A$ matrix are useful in solving the system of ODEs. they describe how systems behave under linear transformations.
 
 **Example:** Suppose we have a matrix $A$ representing a linear transformation. Finding its eigenvalues and eigenvectors can help us understand how the transformation stretches or compresses space along certain directions. In mechanical systems, eigenvalues and eigenvectors determine natural frequencies and modes of vibration.
 
@@ -86,7 +87,7 @@ $x = x + iy$
 
 Solutions of differential equations involve complex numbers and complex functions.
 
-Complex analysis deals with functions of complex variables.
+Complex analysis deals with the functions of complex variables.
 
 **Example:** Residue theorem in complex analysis allows efficient evaluation of integrals along closed contours.
 
