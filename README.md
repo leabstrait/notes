@@ -20,6 +20,7 @@
   - [test-merge](git/test-merge.md)
 
 ### mathematics
+  - [calculus](mathematics/calculus.md)
   - [engineering-mathematics](mathematics/engineering-mathematics.md)
   - [mathematics-notes](mathematics/mathematics-notes.md)
 
